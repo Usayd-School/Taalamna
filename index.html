@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تعلمنا v7.0 - البطاقات العملاقة للمعلم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #00C897; 
+            --secondary: #00A3C4; 
+            --dark: #0A2647; 
+            --bg-color: #F1F5F9;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --radius-card: 32px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            font-size: 14px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--dark), var(--secondary));
+            color: white;
+            padding: 60px 30px 120px 30px;
+            text-align: right;
+            border-bottom-left-radius: 45px;
+            border-bottom-right-radius: 45px;
+        }
+
+        header h1 { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+        header p { font-size: 15px; opacity: 0.85; }
+
+        /* ======================== حاوية الكروت الخارجية الكبيرة ======================== */
+        .carousel-container {
+            margin-top: -90px; 
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            padding-bottom: 25px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+            padding: 0 calc(50% - 165px); 
+        }
+
+        .wallet-card {
+            min-width: 330px; 
+            max-width: 330px;
+            height: 410px;    
+            background: white;
+            border-radius: var(--radius-card);
+            padding: 35px 28px;
+            margin: 0 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255,255,255,0.8);
+            cursor: pointer;
+            position: relative;
+            transform: scale(0.88);
+            opacity: 0.5;
+            transition: transform 0.45s, opacity 0.45s, box-shadow 0.3s;
+        }
+
+        .wallet-card.active-card {
+            transform: scale(1);
+            opacity: 1;
+            box-shadow: 0 30px 60px rgba(10, 38, 71, 0.18);
+        }
+
+        .card-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .card-top .main-icon {
+            width: 95px;
+            height: 95px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 46px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .teacher-card .main-icon { background: linear-gradient(135deg, #00E676, #00C897); }
+        .manager-card .main-icon { background: linear-gradient(135deg, #2979FF, #4361EE); }
+        .parent-card .main-icon { background: linear-gradient(135deg, #FF1744, #F72585); }
+
+        .card-top h3 { font-size: 25px; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
+        .card-top p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        .card-bottom {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            background-color: #F8FAFC;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 15px;
+        }
+
+        .dots-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background-color: #CBD5E1; cursor: pointer; transition: all 0.3s; }
+        .dot.active-dot { background-color: var(--dark); width: 26px; border-radius: 5px; }
+
+
+        /* ======================== شاشة المعلم الداخلية (بطاقات عملاقة + أيقونات صغيرة) ======================== */
+        .slide-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.6);
+            pointer-events: none;
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+        }
+
+        .slide-panel.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+
+        .panel-header {
+            background: #ffffff;
+            padding: 22px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .panel-title { font-size: 22px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        
+        .btn-back {
+            background: #F1F5F9; border: none; font-size: 18px; cursor: pointer;
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+
+        .panel-content { padding: 20px; flex: 1; overflow-y: auto; }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 20px 10px 15px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .inner-carousel {
+            width: 100%;
+            overflow: hidden;
+            padding-bottom: 20px;
+        }
+
+        .inner-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            /* موازنة دقيقة لتوسيط كروت المعلم العملاقة الجديدة (العرض الجديد 340px) */
+            padding: 0 calc(50% - 170px); 
+        }
+
+        /* [تعديل جوهري] تكبير كروت المعلم بشكل عملاق ومبهر */
+        .teacher-service-card {
+            min-width: 340px; /* تم تكبير العرض إلى 340px ليملأ الواجهة بفخامة */
+            max-width: 340px;
+            height: 340px;    /* تم زيادة الارتفاع إلى 340px لاستيعاب النصوص والنجمة براحة */
+            background: white;
+            border-radius: 30px;
+            padding: 28px;
+            margin: 0 15px; /* زيادة الهامش ليعطي مساحة تنفس بين الكروت العملاقة */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.01);
+            position: relative;
+            transform: scale(0.9);
+            opacity: 0.5;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .teacher-service-card.active-inner-card {
+            transform: scale(1);
+            opacity: 1;
+            box-shadow: 0 25px 50px rgba(0, 168, 150, 0.16);
+            border-color: rgba(0, 200, 151, 0.3);
+        }
+
+        /* تعديل موقع زر النجمة ليتناسب مع الكرت العملاق */
+        .fav-btn {
+            position: absolute;
+            top: 26px;
+            left: 26px;
+            font-size: 24px;
+            color: #CBD5E1;
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+            z-index: 15;
+        }
+        .fav-btn.is-fav { color: #FFB100; transform: scale(1.15); }
+
+        .madrasati-theme { background: linear-gradient(135deg, #ffffff, #f0fdfa); }
+
+        /* الأيقونات صغيرة وأنيقة (محاطة بخلفية دائرية ناعمة) */
+        .inner-card-body i {
+            font-size: 22px; 
+            color: var(--primary);
+            background: rgba(0, 200, 151, 0.08); 
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+        .madrasati-theme .inner-card-body i { color: var(--secondary); background: rgba(0, 163, 196, 0.08); }
+
+        /* حجم النصوص داخل الكرت العملاق */
+        .inner-card-body h4 { font-size: 21px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+        .inner-card-body p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        .fav-badge {
+            font-size: 11px; background-color: #FFF9E6; color: #D97706; padding: 4px 12px; border-radius: 12px; font-weight: 700; display: inline-block; opacity: 0; transition: opacity 0.3s; margin-top: 8px;
+        }
+        .is-fav + .inner-card-body .fav-badge { opacity: 1; }
+
+        /* زر الإطلاق المطور أسفل الكرت العملاق */
+        .btn-launch {
+            text-decoration: none; width: 100%; padding: 14px; border-radius: 16px; background-color: #F8FAFC; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 14px; color: var(--dark);
+            transition: background-color 0.2s;
+        }
+        .btn-launch:active { background-color: #E2E8F0; }
+
+        /* شبكة التطبيقات الفرعية بالأسفل */
+        .mini-apps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            padding: 5px;
+        }
+
+        .mini-app-item {
+            background-color: #ffffff; border-radius: 22px; padding: 18px 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.01); cursor: pointer; transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.005);
+        }
+        .mini-app-item:active { transform: scale(0.93); }
+
+        .mini-app-item .app-icon-box {
+            width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px auto;
+        }
+
+        .app-blue { background-color: #EEF2FF; color: #4F46E5; }
+        .app-purple { background-color: #FDF2F8; color: #DB2777; }
+        .app-amber { background-color: #FFF7ED; color: #D97406; }
+
+        .mini-app-item span { font-size: 13px; font-weight: 700; color: var(--text-main); display: block; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>تطبيق تعلمنا</h1>
+        <p>المحفظة الرقمية الذكية للخدمات المدرسية</p>
+    </header>
+
+    <div class="carousel-container">
+        <div class="carousel-track" id="cardTrack">
+            <div class="wallet-card teacher-card active-card" onclick="handleCardClick(0)">
+                <div class="card-top">
+                    <div class="main-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <h3>بوابة المعلم</h3>
+                    <p>إدارة الحصص، رصد غياب الطلاب، وتصفح الخدمات الأساسية والمتقدمة في بيئة عمل ذكية</p>
+                </div>
+                <div class="card-bottom">
+                    <span>دخول البوابة</span><i class="fa-solid fa-chevron-left"></i>
+                </div>
+            </div>
+            <div class="wallet-card manager-card" onclick="handleCardClick(1)">
+                <div class="card-top">
+                    <div class="main-icon"><i class="fa-solid fa-user-tie"></i></div>
+                    <h3>بوابة المدير</h3>
+                    <p>الإشراف الشامل، متابعة أداء الفصول والمدرسة، واصدار التقارير للمشرفين الإداريين</p>
+                </div>
+                <div class="card-bottom">
+                    <span>دخول البوابة</span><i class="fa-solid fa-chevron-left"></i>
+                </div>
+            </div>
+            <div class="wallet-card parent-card" onclick="handleCardClick(2)">
+                <div class="card-top">
+                    <div class="main-icon"><i class="fa-solid fa-users-dependent"></i></div>
+                    <h3>بوابة ولي الأمر</h3>
+                    <p>متابعة التحصيل الأكاديمي، سلوك الأبناء، والغياب اليومي والتواصل المباشر مع المدرسة</p>
+                </div>
+                <div class="card-bottom">
+                    <span>دخول البوابة</span><i class="fa-solid fa-chevron-left"></i>
+                </div>
+            </div>
+        </div>
+        <div class="dots-container">
+            <div class="dot active-dot" onclick="moveToCard(0)"></div>
+            <div class="dot" onclick="moveToCard(1)"></div>
+            <div class="dot" onclick="moveToCard(2)"></div>
+        </div>
+    </div>
+
+
+    <div class="slide-panel" id="teacherPanel">
+        <div class="panel-header">
+            <div class="panel-title">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span>بوابة المعلم المحدثة</span>
+            </div>
+            <button class="btn-back" onclick="closeTeacherPanel()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+        </div>
+
+        <div class="panel-content">
+            
+            <div class="section-title">
+                <i class="fa-solid fa-star" style="color: #FFB100;"></i>
+                <span>الخدمات الأساسية والمفضلة</span>
+            </div>
+
+            <div class="inner-carousel">
+                <div class="inner-track" id="innerTrack">
+                    
+                    <div class="teacher-service-card madrasati-theme active-inner-card" onclick="moveInnerCard(0)">
+                        <div class="fav-btn" onclick="toggleFavorite(this, event)"><i class="fa-solid fa-star"></i></div>
+                        <div class="inner-card-body">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <h4>منصة مدرستي</h4>
+                            <p>رصد الحصص والتحضير الذكي السريع للمقررات والواجبات الإثرائية عبر حساب مايكروسوفت الوزاري الرسمي الموحد.</p>
+                            <span class="fav-badge">المفضلة الحالية</span>
+                        </div>
+                        <a href="https://mysignins.microsoft.com/register?requirement=RegistrationCampaign&authMethods=128&authMethodCount=1" target="_blank" class="btn-launch">
+                            <span>فتح الرابط الرسمي</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <div class="teacher-service-card" onclick="moveInnerCard(1)">
+                        <div class="fav-btn" onclick="toggleFavorite(this, event)"><i class="fa-solid fa-star"></i></div>
+                        <div class="inner-card-body">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <h4>الغياب اليومي</h4>
+                            <p>تسجيل ورصد الحضور والغياب المباشر مع إرسال إشعارات فورية لغرفة الإدارة وأولياء الأمور لطلاب الفصول الموكلة إليك اليوم.</p>
+                            <span class="fav-badge">المفضلة الحالية</span>
+                        </div>
+                        <div class="btn-launch"><span>ابدأ الرصد الآن</span><i class="fa-solid fa-chevron-left"></i></div>
+                    </div>
+
+                    <div class="teacher-service-card" onclick="moveInnerCard(2)">
+                        <div class="fav-btn" onclick="toggleFavorite(this, event)"><i class="fa-solid fa-star"></i></div>
+                        <div class="inner-card-body">
+                            <i class="fa-solid fa-book-open"></i>
+                            <h4>الجدول المدرسي</h4>
+                            <p>متابعة حصص الأسبوع وتوزيع الخطط الزمنية والمناهج المعتمدة وتلقي تعديلات جدول الانتظار وحصص الاحتياط بدقة.</p>
+                            <span class="fav-badge">المفضلة الحالية</span>
+                        </div>
+                        <div class="btn-launch"><span>عرض الجدول</span><i class="fa-solid fa-chevron-left"></i></div>
+                    </div>
+
+                </div>
+                <div class="dots-container" style="margin-top: 15px;">
+                    <div class="dot active-dot" id="idot0" onclick="moveInnerCard(0)"></div>
+                    <div class="dot" id="idot1" onclick="moveInnerCard(1)"></div>
+                    <div class="dot" id="idot2" onclick="moveInnerCard(2)"></div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <i class="fa-solid fa-grip" style="color: var(--secondary);"></i>
+                <span>تطبيقات وأدوات مساعدة للمعلم</span>
+            </div>
+
+            <div class="mini-apps-grid">
+                <div class="mini-app-item">
+                    <div class="app-icon-box app-blue"><i class="fa-solid fa-chart-pie"></i></div>
+                    <span>تحليل الأداء</span>
+                </div>
+                <div class="mini-app-item">
+                    <div class="app-icon-box app-purple"><i class="fa-solid fa-id-card-clip"></i></div>
+                    <span>الموهوبين</span>
+                </div>
+                <div class="mini-app-item">
+                    <div class="app-icon-box app-amber"><i class="fa-solid fa-robot"></i></div>
+                    <span>التصحيح الآلي</span>
+                </div>
+                <div class="mini-app-item">
+                    <div class="app-icon-box app-amber" style="background-color: #E0F2FE; color: #0369A1;"><i class="fa-solid fa-star"></i></div>
+                    <span>رصد السلوك</span>
+                </div>
+                <div class="mini-app-item">
+                    <div class="app-icon-box app-blue" style="background-color: #ECFDF5; color: #047857;"><i class="fa-solid fa-file-invoice"></i></div>
+                    <span>التقارير</span>
+                </div>
+                <div class="mini-app-item">
+                    <div class="app-icon-box app-purple" style="background-color: #FFF1F2; color: #BE123C;"><i class="fa-solid fa-envelope"></i></div>
+                    <span>الرسائل</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // دالة تحريك كروت الواجهة الخارجية (العرض شامل الـ Margin أصبح 360px)
+        let mainIndex = 0;
+        const mainTrack = document.getElementById('cardTrack');
+        const mainCards = document.querySelectorAll('.wallet-card');
+        const mainDots = document.querySelectorAll('.dot:not([id^="idot"])');
+
+        function moveToCard(index) {
+            mainIndex = index;
+            mainTrack.style.transform = `translateX(${mainIndex * 360}px)`;
+            mainCards.forEach((card, i) => card.classList.toggle('active-card', i === mainIndex));
+            mainDots.forEach((dot, i) => dot.classList.toggle('active-dot', i === mainIndex));
+        }
+
+        function handleCardClick(index) {
+            if (index === mainIndex) {
+                if(index === 0) document.getElementById('teacherPanel').classList.add('open');
+            } else {
+                moveToCard(index);
+            }
+        }
+
+        function closeTeacherPanel() { document.getElementById('teacherPanel').classList.remove('open'); }
+
+        // [تعديل برمجـي] دالة تحريك كروت المعلم الداخلية بناءً على المسافة العملاقة الجديدة (370px شامل الـ Margin)
+        let innerIndex = 0;
+        const innerTrack = document.getElementById('innerTrack');
+        const innerCards = document.querySelectorAll('.teacher-service-card');
+
+        function moveInnerCard(index) {
+            innerIndex = index;
+            innerTrack.style.transform = `translateX(${innerIndex * 370}px)`;
+            innerCards.forEach((card, i) => card.classList.toggle('active-inner-card', i === innerIndex));
+            
+            for(let i=0; i<3; i++) {
+                document.getElementById(`idot${i}`).classList.toggle('active-dot', i === innerIndex);
+            }
+        }
+
+        // نظام النجمة وتفضيل كروت المعلم
+        function toggleFavorite(element, event) {
+            event.stopPropagation(); 
+            element.classList.toggle('is-fav');
+            if (element.classList.contains('is-fav')) {
+                element.style.transform = "scale(1.4)";
+                setTimeout(() => element.style.transform = "scale(1.15)", 200);
+            } else {
+                element.style.transform = "scale(1)";
+            }
+        }
+    </script>
+</body>
+</html>
