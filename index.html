@@ -3,489 +3,1545 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تعلمنا v7.0 - البطاقات العملاقة للمعلم</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>بوابة ولي الأمر | Taalamna 🚀</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         :root {
-            --primary: #00C897; 
-            --secondary: #00A3C4; 
-            --dark: #0A2647; 
-            --bg-color: #F1F5F9;
-            --card-bg: #FFFFFF;
-            --text-main: #0F172A;
-            --text-muted: #64748B;
-            --radius-card: 32px;
+            --bg: #eef2ff; --white: #ffffff; --primary: #4f46e5; --secondary: #8b5cf6;
+            --dark: #1e293b; --text-muted: #64748b; --border: rgba(255,255,255,0.4);
+            --shadow1: 8px 8px 18px rgba(174,174,192,0.35); --shadow2: -8px -8px 18px rgba(255,255,255,0.95);
+            --exc-bg: #dcfce7; --exc-txt: #15803d; --we-bg: #fee2e2; --we-txt: #dc2626;
+            --nafess-grad: linear-gradient(135deg, #1e1b4b, #312e81);
+            
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: linear-gradient(135deg,#f8fafc,#e2e8f0,#f1f5f9); 
+            margin: 0; 
+            min-height: 100vh; 
+            padding: 10px; 
+            color: var(--dark);
             overflow-x: hidden;
-            font-size: 14px;
         }
 
-        header {
-            background: linear-gradient(135deg, var(--dark), var(--secondary));
-            color: white;
-            padding: 60px 30px 120px 30px;
-            text-align: right;
-            border-bottom-left-radius: 45px;
-            border-bottom-right-radius: 45px;
+        .login-box { 
+            background: rgba(255,255,255,0.6); backdrop-filter: blur(20px); padding: 30px 20px; 
+            border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.1); 
+            width: 100%; max-width: 400px; text-align: center; margin: 8vh auto; 
         }
 
-        header h1 { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
-        header p { font-size: 15px; opacity: 0.85; }
-
-        /* ======================== حاوية الكروت الخارجية الكبيرة ======================== */
-        .carousel-container {
-            margin-top: -90px; 
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-            padding-bottom: 25px;
+        .inp { 
+            width: 100%; padding: 14px; border-radius: 15px; border: none; 
+            font-family: 'Cairo'; font-size: 16px; font-weight: 700; outline: none; 
+            background: rgba(255,255,255,0.9); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05); 
+            margin-bottom: 15px; 
         }
 
-        .carousel-track {
-            display: flex;
-            transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-            padding: 0 calc(50% - 165px); 
+        .btn-action { 
+            width: 100%; padding: 14px; border-radius: 15px; border: none; 
+            background: linear-gradient(135deg,var(--primary),var(--secondary)); color: white; 
+            font-weight: 800; cursor: pointer; font-size: 15px; transition: 0.3s; 
+            min-height: 48px; display: inline-flex; align-items: center; justify-content: center;
         }
 
-        .wallet-card {
-            min-width: 330px; 
-            max-width: 330px;
-            height: 410px;    
-            background: white;
-            border-radius: var(--radius-card);
-            padding: 35px 28px;
-            margin: 0 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.06);
-            border: 1px solid rgba(255,255,255,0.8);
-            cursor: pointer;
-            position: relative;
-            transform: scale(0.88);
-            opacity: 0.5;
-            transition: transform 0.45s, opacity 0.45s, box-shadow 0.3s;
-        }
-
-        .wallet-card.active-card {
-            transform: scale(1);
-            opacity: 1;
-            box-shadow: 0 30px 60px rgba(10, 38, 71, 0.18);
-        }
-
-        .card-top {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .card-top .main-icon {
-            width: 95px;
-            height: 95px;
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 46px;
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .teacher-card .main-icon { background: linear-gradient(135deg, #00E676, #00C897); }
-        .manager-card .main-icon { background: linear-gradient(135deg, #2979FF, #4361EE); }
-        .parent-card .main-icon { background: linear-gradient(135deg, #FF1744, #F72585); }
-
-        .card-top h3 { font-size: 25px; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
-        .card-top p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
-
-        .card-bottom {
-            width: 100%;
-            padding: 14px 18px;
-            border-radius: 20px;
-            background-color: #F8FAFC;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            color: var(--dark);
-            font-size: 15px;
-        }
-
-        .dots-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background-color: #CBD5E1; cursor: pointer; transition: all 0.3s; }
-        .dot.active-dot { background-color: var(--dark); width: 26px; border-radius: 5px; }
-
-
-        /* ======================== شاشة المعلم الداخلية (بطاقات عملاقة + أيقونات صغيرة) ======================== */
-        .slide-panel {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-color);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            transform: scale(0.6);
-            pointer-events: none;
-            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
-        }
-
-        .slide-panel.open { opacity: 1; transform: scale(1); pointer-events: auto; }
-
-        .panel-header {
-            background: #ffffff;
-            padding: 22px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-        }
-
-        .panel-title { font-size: 22px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        #reportDashboard { display: none; max-width: 900px; margin: auto; }
         
-        .btn-back {
-            background: #F1F5F9; border: none; font-size: 18px; cursor: pointer;
-            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        .navbar { 
+            background: rgba(255,255,255,0.7); backdrop-filter: blur(15px); padding: 16px; 
+            border-radius: 20px; border: 1px solid var(--border); display: flex; 
+            justify-content: space-between; align-items: center; margin-bottom: 15px; 
+            box-shadow: var(--shadow1); gap: 10px; flex-wrap: wrap; 
         }
 
-        .panel-content { padding: 20px; flex: 1; overflow-y: auto; }
+        /* تنسيق الأزرار العلوية الموحد */
+        .nav-top-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            color: white; padding: 8px 14px; border-radius: 12px; cursor: pointer; font-weight: 800;
+            font-size: 11px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: 0.2s; user-select: none; border: none;
+        }
+        .nav-top-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25); filter: brightness(1.1); }
+        
+        .btn-tasks { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .btn-plan { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-call { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .btn-logout { background: var(--dark); padding: 8px 16px; }
 
-        .section-title {
-            font-size: 17px;
-            font-weight: 800;
-            color: var(--dark);
-            margin: 20px 10px 15px 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .tasks-counter-badge { background: #ef4444; color: white; border-radius: 50px; padding: 2px 8px; font-size: 10px; font-weight: 900; }
+
+        .navbar-tasks-dropdown {
+            display: none; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
+            border-radius: 16px; padding: 14px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+        }
+        .navbar-tasks-dropdown.show { display: block; }
+
+        .rank-badge { background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 900; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fde68a; margin-top: 5px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+
+        .stat-card { 
+            background: rgba(255,255,255,0.8); padding: 12px 6px; border-radius: 16px; 
+            text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow1); 
+            cursor: pointer; transition: 0.3s; user-select: none;
+        }
+        .stat-card:hover { transform: translateY(-3px); background: #fff; }
+        .stat-card h4 { margin: 0; font-size: 11px; color: var(--text-muted); }
+        .stat-card p { margin: 4px 0 0; font-size: 20px; font-weight: 900; color: var(--primary); }
+
+        .report-item { background: rgba(255,255,255,0.85); border-radius: 16px; padding: 16px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: var(--shadow1); position: relative; overflow: hidden; }
+        .report-item::before { content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 5px; background: var(--primary); }
+        .report-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
+        
+        .badge { padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+        .unit-badge { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-block; margin-top: 4px; }
+        .download-btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; gap: 8px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; text-decoration: none; padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; margin-top: 10px; transition: 0.2s; box-shadow: 0 4px 10px rgba(37,99,235,0.15); }
+        
+        .hw-btn { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 900; border: none; display: inline-flex; align-items: center; gap: 5px; }
+        .hw-pending { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .hw-done { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+        .seen-status-container { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; display: inline-block; margin-top: 5px; border: 1px solid #bbf7d0; }
+
+        #popup { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 15px; }
+        .popup-box { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+        .lvl-exc { background: var(--exc-bg); color: var(--exc-txt); }
+        .lvl-cre { background: #e0e7ff; color: #3730a3; }
+        .lvl-vg  { background: #dbeafe; color: #1e40af; }
+        .lvl-fa  { background: #fef3c7; color: #b45309; }
+        .lvl-we  { background: var(--we-bg); color: var(--we-txt); }
+        
+        .warning-badge { background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 6px; font-size: 10px; margin-right: 5px; }
+        .award-text { color: #d97706; font-weight: 800; font-size: 12px; }
+
+        .btn-start-task, .btn-start-test { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 12px; border-radius: 10px; border: none; color: white; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: var(--transition); }
+        .btn-start-task { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .btn-start-test { background: linear-gradient(135deg, #10b981, #059669); }
+
+        /* الأقسام الجديدة: مسار التعلم */
+        .learning-path-card {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9); border-radius: 16px; padding: 16px; margin-bottom: 20px;
+            border: 1px solid var(--border); box-shadow: var(--shadow1); cursor: pointer; transition: 0.3s;
+            border-right: 5px solid #4f46e5; position: relative; overflow: hidden;
+        }
+        .learning-path-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+        .path-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .path-title { font-size: 14px; font-weight: 900; color: var(--dark); margin: 0; display: flex; align-items: center; gap: 6px; }
+        .path-overall-pct { font-size: 18px; font-weight: 900; color: #4f46e5; }
+        .path-main-track { width: 100%; height: 12px; background: #e2e8f0; border-radius: 10px; margin-bottom: 8px; overflow: hidden; border: 1px solid #cbd5e1; }
+        .path-main-fill { height: 100%; background: linear-gradient(90deg, #4f46e5, #8b5cf6); border-radius: 10px; transition: 0.8s ease-in-out; }
+        
+        .subject-paths-details { display: none; margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 15px; animation: fadeIn 0.4s ease; }
+        .sub-path-item { margin-bottom: 12px; }
+        .sub-path-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #334155; margin-bottom: 4px; }
+        .sub-path-track { width: 100%; height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .sub-path-fill { height: 100%; border-radius: 10px; transition: 0.8s ease-in-out; }
+        
+        /* تنسيقات خطة المذاكرة (للقائمة المنسدلة) */
+        .plan-progress-wrap { background: #f1f5f9; height: 8px; border-radius: 10px; overflow: hidden; margin-top: 10px; position: relative; }
+        .plan-progress-fill { background: linear-gradient(90deg, #10b981, #059669); height: 100%; width: 0%; transition: width 0.5s ease; }
+        
+        .plan-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .plan-item-box {
+            display: flex; justify-content: space-between; align-items: center; padding: 12px;
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; transition: 0.3s;
+        }
+        .plan-item-box.completed { background: #ecfdf5; border-color: #a7f3d0; opacity: 0.8; }
+        .plan-item-info { display: flex; flex-direction: column; gap: 4px; }
+        .plan-subj-badge { font-size: 10px; font-weight: 900; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; align-self: flex-start; }
+        .plan-desc { font-size: 12px; font-weight: 700; color: #1e293b; line-height: 1.5; }
+        .plan-item-box.completed .plan-desc { text-decoration: line-through; color: #64748b; }
+        
+        .plan-checkbox-wrap { position: relative; width: 24px; height: 24px; cursor: pointer; }
+        .plan-checkbox-wrap input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        .checkmark { position: absolute; top: 0; left: 0; height: 24px; width: 24px; background-color: #fff; border: 2px solid #cbd5e1; border-radius: 6px; transition: 0.2s; }
+        .plan-checkbox-wrap:hover input ~ .checkmark { border-color: #10b981; }
+        .plan-checkbox-wrap input:checked ~ .checkmark { background-color: #10b981; border-color: #10b981; }
+        .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+        .plan-checkbox-wrap input:checked ~ .checkmark:after { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* نافس والأقسام الأخرى */
+        .nafess-container { background: var(--nafess-grad); color: white; border-radius: 20px; padding: 18px; margin-bottom: 20px; box-shadow: var(--shadow1); border: 1px solid rgba(255,255,255,0.1); }
+        .nafess-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
+        .nafess-badge { background: #f59e0b; color: #1e1b4b; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; }
+        .nafess-rewards-summary { background: rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px); }
+
+        .current-units-box { background: rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 14px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .unit-card-item { background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .unit-info-part { display: flex; flex-direction: column; gap: 2px; }
+        .unit-subject-label { font-size: 11px; font-weight: 800; color: #a7f3d0; opacity: 0.9; }
+        .unit-name-text { font-size: 12px; font-weight: 700; color: #ffffff; }
+        .unit-reward-pill { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 4px 6px; font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .unit-reward-pill.gold-target { color: #fef08a; background: rgba(245, 158, 11, 0.25); border-color: rgba(245, 158, 11, 0.4); }
+        .unit-reward-pill.silver-target { color: #e2e8f0; background: rgba(148, 163, 184, 0.25); border-color: rgba(148, 163, 184, 0.4); }
+
+        .available-badges-container { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .avail-badge { background: rgba(245, 158, 11, 0.2); color: #fef08a; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+
+        .leaderboard-box { background: rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto; }
+        .leaderboard-title { font-size: 12px; font-weight: 800; color: #fef08a; margin: 0 0 10px 0; display: flex; align-items: center; gap: 6px; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: right; font-size: 12px; min-width: 280px; }
+        .leaderboard-table th { padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.2); color: #a7f3d0; font-weight: 700; }
+        .leaderboard-table td { padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .leaderboard-row-current { background: rgba(245, 158, 11, 0.25); border-radius: 10px; font-weight: bold; }
+        .rank-num { background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 6px; font-weight: 900; font-size: 10px; }
+        .rank-num.first { background: #f59e0b; color: #1e1b4b; }
+
+        .nafess-box { background: rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .btn-nafess-start { background: white; color: #1e1b4b; padding: 8px 12px; border-radius: 10px; font-weight: 800; border: none; cursor: pointer; font-size: 11px; transition: 0.2s; width: 100%; text-align: center; }
+
+        .weeks-card { background: rgba(255,255,255,0.7); padding: 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow1); margin-top: 20px; }
+        .weeks-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+        
+        .week-item { padding: 6px 4px; border-radius: 10px; text-align: center; font-size: 11px; font-weight: 700; background: white; border: 1px solid rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; }
+        .week-item.completed { background: #e2fbf0; color: #10b981; border-color: #a7f3d0; }
+        .week-item.current { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.02); }
+
+        .rank-card-compact { background: rgba(255, 255, 255, 0.85); border: 1px solid var(--border); border-radius: 12px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: var(--shadow1); margin-top: 8px; width: 100%; }
+        .rank-card-compact .rank-num-box { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-weight: 900; font-size: 12px; padding: 4px 8px; border-radius: 8px; white-space: nowrap; }
+        .rank-card-compact .diff-box { font-size: 10px; font-weight: 800; color: var(--dark); }
+
+        .energy-bar-wrapper { width: 100%; min-width: 80px; background: rgba(0, 0, 0, 0.08); border-radius: 10px; height: 12px; position: relative; overflow: hidden; border: 1px solid rgba(0, 0, 0, 0.05); display: flex; align-items: center; }
+        .energy-bar-fill { height: 100%; background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%); border-radius: 10px; transition: width 0.6s ease-in-out, background 0.6s ease; }
+        .energy-bar-text { position: absolute; width: 100%; text-align: center; font-size: 9px; font-weight: 900; color: #1e293b; text-shadow: 0 0 3px rgba(255, 255, 255, 0.8); }
+
+        .hw-energy-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border-radius: 16px; padding: 14px; margin-bottom: 15px; 
+            border: 1px solid var(--border); box-shadow: var(--shadow1); 
+            border-right: 5px solid var(--primary);
+        }
+        .hw-energy-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .hw-energy-title h4 { margin: 0; font-size: 13px; color: var(--dark); display: flex; align-items: center; gap: 6px; }
+        .hw-energy-pct { font-weight: 900; color: var(--primary); font-size: 16px; }
+        .hw-energy-details { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); flex-wrap: wrap; gap: 5px;}
+
+        .dash-grid-top { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 15px; }
+        @media(min-width: 600px) {
+            .dash-grid-top { grid-template-columns: 1fr 1fr; }
         }
 
-        .inner-carousel {
-            width: 100%;
-            overflow: hidden;
-            padding-bottom: 20px;
+        .level-indicator-card {
+            background: linear-gradient(135deg, #ffffff, #f0fdf4);
+            border-radius: 16px; padding: 14px; 
+            border: 1px solid var(--border); box-shadow: var(--shadow1); 
+            border-right: 5px solid #10b981;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        .inner-track {
-            display: flex;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            /* موازنة دقيقة لتوسيط كروت المعلم العملاقة الجديدة (العرض الجديد 340px) */
-            padding: 0 calc(50% - 170px); 
+        .indicator-main-bar { width: 100%; height: 16px; background: #e2e8f0; border-radius: 10px; margin-top: 8px; position: relative; overflow: hidden; border: 1px solid #cbd5e1; display: none; }
+        .indicator-fill { height: 100%; border-radius: 10px; transition: 0.6s ease; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: white; width: 0%; background: #94a3b8; }
+
+        .subjects-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }
+        
+        .subject-card-static {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border-radius: 14px; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border);
+            box-shadow: var(--shadow1); cursor: pointer; transition: transform 0.3s;
+            min-height: 110px;
+        }
+        .subject-card-static:hover { transform: translateY(-3px); background: #fff; border-color: #cbd5e1; }
+
+        .confirm-box {
+            background: #fffbeb; border: 2px dashed #f59e0b; padding: 10px; border-radius: 12px; margin-bottom: 15px; text-align: right; font-size: 11px; display: none;
         }
 
-        /* [تعديل جوهري] تكبير كروت المعلم بشكل عملاق ومبهر */
-        .teacher-service-card {
-            min-width: 340px; /* تم تكبير العرض إلى 340px ليملأ الواجهة بفخامة */
-            max-width: 340px;
-            height: 340px;    /* تم زيادة الارتفاع إلى 340px لاستيعاب النصوص والنجمة براحة */
-            background: white;
-            border-radius: 30px;
-            padding: 28px;
-            margin: 0 15px; /* زيادة الهامش ليعطي مساحة تنفس بين الكروت العملاقة */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            border: 1px solid rgba(0,0,0,0.01);
-            position: relative;
-            transform: scale(0.9);
-            opacity: 0.5;
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        .interactive-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 4000; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 15px; }
+        .modal-content-unified { background: #f8fafc; width: 100%; max-width: 800px; max-height: 90vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+        .modal-header-unified { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header-unified h3 { margin: 0; font-size: 1.05rem; }
+        .close-modal-unified { background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; }
+        .close-modal-unified:hover { background: #ef4444; }
+        .modal-body-unified { padding: 16px; overflow-y: auto; flex: 1; }
+        
+        .assessment-progress-wrapper { background: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden; margin-bottom: 8px; position: relative; border: 1px solid #cbd5e1; }
+        .assessment-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.3s ease; }
+        .assessment-progress-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 14px; }
+
+        .video-player-container { width: 100%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px; display: none; }
+        .video-player { width: 100%; max-height: 280px; outline: none; display: block; }
+        
+        .interactive-layout { display: flex; flex-direction: column; gap: 15px; }
+        @media(min-width: 768px) {
+            .interactive-layout.has-video { flex-direction: row; align-items: flex-start; } 
+            .interactive-layout.has-video .video-player-container { flex: 1.2; position: sticky; top: 0; margin-bottom: 0; }
+            .interactive-layout.has-video .questions-area { flex: 1; max-height: 350px; overflow-y: auto; padding-right: 10px; }
         }
 
-        .teacher-service-card.active-inner-card {
-            transform: scale(1);
-            opacity: 1;
-            box-shadow: 0 25px 50px rgba(0, 168, 150, 0.16);
-            border-color: rgba(0, 200, 151, 0.3);
+        .questions-area { display: flex; flex-direction: column; gap: 12px; }
+        .q-card { background: white; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .q-text { font-weight: bold; font-size: 13px; margin-bottom: 10px; color: var(--dark); }
+        .q-options { display: flex; flex-direction: column; gap: 8px; }
+        .q-opt-label { background: #f1f5f9; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: bold; transition: 0.2s; }
+        .q-opt-label:hover { background: #e0f2fe; border-color: #bae6fd; }
+        .q-opt-label input[type="radio"] { accent-color: var(--primary); transform: scale(1.1); }
+        
+        .q-opt-label.skip-opt { background: #f8fafc; border: 1px dashed #cbd5e1; color: #64748b; margin-top: 4px; }
+        .q-opt-label.skip-opt:hover { background: #f1f5f9; border-color: #94a3b8; }
+
+        .submit-assessment-btn { margin-top: 15px; padding: 12px; background: #10b981; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 900; font-size: 0.95rem; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
+        .submit-assessment-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.35); }
+
+        @media(min-width: 600px) {
+            body { padding: 20px; }
+            .navbar { flex-wrap: nowrap; padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+            .stat-card p { font-size: 20px; }
+            .weeks-grid { grid-template-columns: repeat(8, 1fr); }
+            .btn-nafess-start { width: auto; }
+            .rank-card-compact { display: inline-flex; width: auto; justify-content: flex-start; }
+            .download-btn { width: auto; }
         }
-
-        /* تعديل موقع زر النجمة ليتناسب مع الكرت العملاق */
-        .fav-btn {
-            position: absolute;
-            top: 26px;
-            left: 26px;
-            font-size: 24px;
-            color: #CBD5E1;
-            cursor: pointer;
-            transition: transform 0.2s, color 0.2s;
-            z-index: 15;
-        }
-        .fav-btn.is-fav { color: #FFB100; transform: scale(1.15); }
-
-        .madrasati-theme { background: linear-gradient(135deg, #ffffff, #f0fdfa); }
-
-        /* الأيقونات صغيرة وأنيقة (محاطة بخلفية دائرية ناعمة) */
-        .inner-card-body i {
-            font-size: 22px; 
-            color: var(--primary);
-            background: rgba(0, 200, 151, 0.08); 
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 14px;
-            margin-bottom: 16px;
-        }
-        .madrasati-theme .inner-card-body i { color: var(--secondary); background: rgba(0, 163, 196, 0.08); }
-
-        /* حجم النصوص داخل الكرت العملاق */
-        .inner-card-body h4 { font-size: 21px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
-        .inner-card-body p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
-
-        .fav-badge {
-            font-size: 11px; background-color: #FFF9E6; color: #D97706; padding: 4px 12px; border-radius: 12px; font-weight: 700; display: inline-block; opacity: 0; transition: opacity 0.3s; margin-top: 8px;
-        }
-        .is-fav + .inner-card-body .fav-badge { opacity: 1; }
-
-        /* زر الإطلاق المطور أسفل الكرت العملاق */
-        .btn-launch {
-            text-decoration: none; width: 100%; padding: 14px; border-radius: 16px; background-color: #F8FAFC; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 14px; color: var(--dark);
-            transition: background-color 0.2s;
-        }
-        .btn-launch:active { background-color: #E2E8F0; }
-
-        /* شبكة التطبيقات الفرعية بالأسفل */
-        .mini-apps-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            padding: 5px;
-        }
-
-        .mini-app-item {
-            background-color: #ffffff; border-radius: 22px; padding: 18px 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.01); cursor: pointer; transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.005);
-        }
-        .mini-app-item:active { transform: scale(0.93); }
-
-        .mini-app-item .app-icon-box {
-            width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px auto;
-        }
-
-        .app-blue { background-color: #EEF2FF; color: #4F46E5; }
-        .app-purple { background-color: #FDF2F8; color: #DB2777; }
-        .app-amber { background-color: #FFF7ED; color: #D97406; }
-
-        .mini-app-item span { font-size: 13px; font-weight: 700; color: var(--text-main); display: block; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>تطبيق تعلمنا</h1>
-        <p>المحفظة الرقمية الذكية للخدمات المدرسية</p>
-    </header>
+<div id="loginArea" class="login-box">
+    <div style="background: var(--primary); color: white; width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; margin: 0 auto 15px;">أ</div>
+    <h2 style="font-size: 20px; margin-bottom: 20px;">بوابة ولي الأمر</h2>
+    <input type="text" id="userInput" class="inp" placeholder="اسم المستخدم">
+    <button class="btn-action" onclick="login()">دخول للاطلاع 🔓</button>
+    <p id="errorMsg" style="color:red; font-size:12px; margin-top:15px; display:none; font-weight:bold;">بيانات الدخول غير صحيحة!</p>
+</div>
 
-    <div class="carousel-container">
-        <div class="carousel-track" id="cardTrack">
-            <div class="wallet-card teacher-card active-card" onclick="handleCardClick(0)">
-                <div class="card-top">
-                    <div class="main-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-                    <h3>بوابة المعلم</h3>
-                    <p>إدارة الحصص، رصد غياب الطلاب، وتصفح الخدمات الأساسية والمتقدمة في بيئة عمل ذكية</p>
-                </div>
-                <div class="card-bottom">
-                    <span>دخول البوابة</span><i class="fa-solid fa-chevron-left"></i>
-                </div>
-            </div>
-            <div class="wallet-card manager-card" onclick="handleCardClick(1)">
-                <div class="card-top">
-                    <div class="main-icon"><i class="fa-solid fa-user-tie"></i></div>
-                    <h3>بوابة المدير</h3>
-                    <p>الإشراف الشامل، متابعة أداء الفصول والمدرسة، واصدار التقارير للمشرفين الإداريين</p>
-                </div>
-                <div class="card-bottom">
-                    <span>دخول البوابة</span><i class="fa-solid fa-chevron-left"></i>
-                </div>
-            </div>
-            <div class="wallet-card parent-card" onclick="handleCardClick(2)">
-                <div class="card-top">
-                    <div class="main-icon"><i class="fa-solid fa-users-dependent"></i></div>
-                    <h3>بوابة ولي الأمر</h3>
-                    <p>متابعة التحصيل الأكاديمي، سلوك الأبناء، والغياب اليومي والتواصل المباشر مع المدرسة</p>
-                </div>
-                <div class="card-bottom">
-                    <span>دخول البوابة</span><i class="fa-solid fa-chevron-left"></i>
-                </div>
-            </div>
+<div id="reportDashboard">
+    <nav class="navbar">
+        <div style="width: 100%;">
+            <h3 id="stdName" style="margin:0; font-size:16px;">اسم الطالب</h3>
+            <small id="stdClass" style="color:var(--text-muted); display:block; font-weight: 700; margin-top:2px;">الفصل: --</small>
+            <div id="stdRank" class="rank-badge">🏆 جاري حساب الترتيب الفعلي...</div>
+            <div id="attendanceBadge"></div>
+            <div id="seenBadgeLocation" style="margin-top: 5px;"></div>
         </div>
-        <div class="dots-container">
-            <div class="dot active-dot" onclick="moveToCard(0)"></div>
-            <div class="dot" onclick="moveToCard(1)"></div>
-            <div class="dot" onclick="moveToCard(2)"></div>
+        <div style="display: flex; gap: 8px; width: 100%; justify-content: space-between; flex-wrap: wrap; align-items: center;">
+            <button id="toggleNafessBtn" class="nav-top-btn" style="flex: 1; font-size:11px; background: linear-gradient(135deg, #f59e0b, #ea580c); display: none;" onclick="toggleNafessView()">🎯 بوابة نافس المحاكية</button>
+            
+            <div style="display: flex; gap: 8px; flex: 1; justify-content: center; flex-wrap: wrap;">
+                <!-- المهام -->
+                <button class="nav-top-btn btn-tasks" onclick="toggleTasksNavbarDropdown()">
+                    <span>📋 المهام</span>
+                    <span id="navbarTasksCount" class="tasks-counter-badge">0</span>
+                </button>
+                <!-- المذاكرة -->
+                <button class="nav-top-btn btn-plan" onclick="togglePlanNavbarDropdown()">
+                    <span>📅 المذاكرة</span>
+                    <span id="navbarPlanCount" class="tasks-counter-badge" style="background: #f59e0b; color: white;">0</span>
+                </button>
+                <!-- المناداة -->
+                <button class="nav-top-btn btn-call" onclick="openParentCallModal()">
+                    <span>📢 المناداة</span>
+                </button>
+            </div>
+
+            <button class="nav-top-btn btn-logout" onclick="location.reload()">خروج</button>
+        </div>
+    </nav>
+
+    <!-- تبويب شريط المهام المنسدل -->
+    <div id="navbarTasksDropdown" class="navbar-tasks-dropdown">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h4 style="margin: 0; font-size: 13px; color: var(--dark);">📋 سجل المهام والتقييمات</h4>
+            <button onclick="toggleTasksNavbarDropdown()" style="border:none; background:#f1f5f9; padding:4px 10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:11px;">إغلاق ✖</button>
+        </div>
+        <div id="navbarTasksList" style="max-height: 350px; overflow-y: auto; padding-left: 5px;"></div>
+    </div>
+
+    <!-- تبويب خطة المذاكرة المنسدل -->
+    <div id="navbarPlanDropdown" class="navbar-tasks-dropdown">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h4 style="margin: 0; font-size: 13px; color: var(--dark);">📅 خطة المذاكرة التلقائية</h4>
+            <button onclick="togglePlanNavbarDropdown()" style="border:none; background:#f1f5f9; padding:4px 10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:11px;">إغلاق ✖</button>
+        </div>
+        <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 10px 0;">أحدث التكاليف والمقررات المرسلة من المعلمين. ضع علامة (صح) عند إنجازها!</p>
+        <div class="plan-progress-wrap" style="margin-bottom: 15px;">
+            <div id="dropdownPlanProgressFill" class="plan-progress-fill"></div>
+        </div>
+        <div id="navbarPlanList" style="max-height: 350px; overflow-y: auto; padding-left: 5px;" class="plan-list">
+            <!-- سيتم تعبئة خطة المذاكرة هنا برمجياً -->
         </div>
     </div>
 
-
-    <div class="slide-panel" id="teacherPanel">
-        <div class="panel-header">
-            <div class="panel-title">
-                <i class="fa-solid fa-chalkboard-user"></i>
-                <span>بوابة المعلم المحدثة</span>
+    <div id="nafessView" style="display: none;">
+        <!-- محتوى نافس المحاكي -->
+        <div class="nafess-container">
+            <div class="nafess-header">
+                <div>
+                    <span class="nafess-badge">بوابة التميز المهارية</span>
+                    <h3 style="margin: 5px 0 0 0; font-size: 15px;">🎯 ميداليات وأوسمة المنافسة المدرسية</h3>
+                </div>
             </div>
-            <button class="btn-back" onclick="closeTeacherPanel()">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
+            
+            <div class="nafess-rewards-summary">
+                <span style="font-size: 22px;">🥇</span>
+                <div>
+                    <strong style="display: block; font-size: 12px;">رصيد الميداليات الذهبية الحالي:</strong>
+                    <span style="font-size: 11px; opacity: 0.95;">تم الحصول على <b id="nafessGoldCount" style="font-size: 14px; color: #f59e0b;">0</b> ميدالية ذهبية من الدروس الحالية!</span>
+                </div>
+            </div>
+
+            <div class="current-units-box">
+                <h4 style="margin: 0 0 10px 0; font-size: 11px; color: #fef08a; display: flex; align-items: center; gap: 6px;">📖 وحدات الأسبوع الحالي والمهارات المستهدفة بمكافأة :</h4>
+                <div id="unitsListContainer">
+                    <div class="unit-card-item">
+                        <div class="unit-info-part">
+                            <span class="unit-subject-label">📐 الرياضيات</span>
+                            <span class="unit-name-text">الوحدة الـ 5 (الكسور والعمليات عليها)</span>
+                        </div>
+                        <div class="unit-reward-pill gold-target">المكافأة: ذهبية 🥇</div>
+                    </div>
+                    <div class="unit-card-item">
+                        <div class="unit-info-part">
+                            <span class="unit-subject-label">🧬 العلوم</span>
+                            <span class="unit-name-text">الوحدة الـ 3 (القوى والحركة في الطبيعة)</span>
+                        </div>
+                        <div class="unit-reward-pill gold-target">المكافأة: ذهبية 🥇</div>
+                    </div>
+                    <div class="unit-card-item">
+                        <div class="unit-info-part">
+                            <span class="unit-subject-label">✍️ لغتي الجميلة</span>
+                            <span class="unit-name-text">الوحدة الـ 4 (الوعي الصحي والقرائي)</span>
+                        </div>
+                        <div class="unit-reward-pill silver-target">المكافأة: فضية 🥈</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 12px 0 6px 0; font-size: 11px; color: #a7f3d0;">🏅 الأوسمة المتاحة هذا الأسبوع:</h4>
+                <div class="available-badges-container">
+                    <span class="avail-badge">⚡ وسام الطالب الموهوب</span>
+                    <span class="avail-badge">🧬 وسام العبقري الصغير</span>
+                    <span class="avail-badge">✍️ وسام الفصاحة والإملاء</span>
+                </div>
+            </div>
+
+            <div class="leaderboard-box">
+                <h4 class="leaderboard-title">📊 لوحة المنافسة وترتيب الطلاب (أوائل الصف)</h4>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>الترتيب</th>
+                            <th>الطالب</th>
+                            <th>طاقة النقاط ⚡</th>
+                            <th>الميداليات 🥇</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="nafess-box">
+                <div>
+                    <span style="font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 6px;">مادة: الرياضيات</span>
+                    <h4 style="margin: 4px 0 0 0; font-size: 12px;">الاختبار التجريبي لمحاكاة نافس - الأعداد والعمليات</h4>
+                </div>
+                <button class="btn-nafess-start" onclick="alert('جاري الانتقال لبيئة الاختبار المحاكي...')">ابدأ الاختبار الآن</button>
+            </div>
         </div>
 
-        <div class="panel-content">
-            
-            <div class="section-title">
-                <i class="fa-solid fa-star" style="color: #FFB100;"></i>
-                <span>الخدمات الأساسية والمفضلة</span>
+        <div class="weeks-card">
+            <h4 style="margin:0; font-size:13px;">📅 خطة التوزيع المهارى والزمني للاختبارات</h4>
+            <small style="color:var(--text-muted); font-size:10px;">تابع الأسابيع المنجزة للاستعداد للاختبار أولاً بأول</small>
+            <div class="weeks-grid" id="weeksContainer"></div>
+        </div>
+    </div>
+
+    <div id="reportsView">
+        <div class="dash-grid-top">
+            <div class="hw-energy-card" style="margin-bottom:0;">
+                <div class="hw-energy-title">
+                    <h4>🔋 مؤشر إنجاز الواجبات</h4>
+                    <span id="hwEnergyText" class="hw-energy-pct">0%</span>
+                </div>
+                <div class="energy-bar-wrapper" style="background: #e2e8f0; border: none;">
+                    <div id="hwEnergyFill" class="energy-bar-fill" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f59e0b);"></div>
+                </div>
+                <div class="hw-energy-details">
+                    <span id="hwCompletedCount">✅ المنجزة: 0</span>
+                    <span id="hwPendingCount">⏳ قيد الانتظار: 0</span>
+                    <span id="hwTotalCount">📚 الإجمالي: 0</span>
+                </div>
             </div>
 
-            <div class="inner-carousel">
-                <div class="inner-track" id="innerTrack">
+            <div class="level-indicator-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="margin: 0; font-size: 13px; color: var(--dark); display: flex; align-items: center; gap: 6px;">📈 تقييم مستوى الطالب التعليمي</h4>
+                    <span id="overallLevelBadge" style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 900;">جاري الرصد...</span>
+                </div>
+                <div class="indicator-main-bar" id="overallEnergyContainer" style="display:block;">
+                    <div id="overallEnergyFill" class="indicator-fill" style="width:0%; background: linear-gradient(90deg, #3b82f6, #10b981);">0%</div>
+                </div>
+                <p style="margin: 8px 0 0 0; font-size: 10px; color: var(--text-muted);">انقر على بطاقة أي مادة أدناه للاطلاع على التفاصيل:</p>
+            </div>
+        </div>
+
+        <!-- مسار التعلم الشامل للمنهج -->
+        <div class="learning-path-card" onclick="toggleLearningPath()">
+            <div class="path-title-row">
+                <h4 class="path-title">🗺️ مسار التعلم الشامل للمناهج</h4>
+                <span id="overallPathPctText" class="path-overall-pct">0%</span>
+            </div>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 10px 0;" id="overallPathDesc">جاري حساب التقدم في المنهج بناءً على تحديد المعلم...</p>
+            
+            <div class="path-main-track">
+                <div id="mainPathFill" class="path-main-fill" style="width: 0%;"></div>
+            </div>
+            
+            <div id="subjectPathsContainer" class="subject-paths-details">
+                <!-- سيتم تعبئة مسارات المواد هنا برمجياً -->
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 10px; color: #94a3b8;">اضغط لعرض أو إخفاء تفاصيل مسار كل مادة 👇</div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.75); padding: 14px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow1); margin-bottom: 20px;">
+            <h4 style="margin: 0 0 10px 0; font-size: 12px; color: var(--primary);">📚 المواد الدراسية وملخص المهارات:</h4>
+            <div class="subjects-cards-grid" id="subjectsCardsContainer"></div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card" onclick="showDetails('exc')"><h4>التميز ✨</h4><p id="stat-exc">0</p></div>
+            <div class="stat-card" onclick="showDetails('cre')"><h4>مبدع 🎨</h4><p id="stat-cre">0</p></div>
+            <div class="stat-card" onclick="showDetails('vg')"><h4>جيد جداً 👍</h4><p id="stat-vg">0</p></div>
+            <div class="stat-card" onclick="showDetails('fa')"><h4>مقبول 🆗</h4><p id="stat-fa">0</p></div>
+            <div class="stat-card" onclick="showDetails('we')"><h4>ضعيف 📉</h4><p id="stat-we">0</p></div>
+            <div class="stat-card" onclick="showDetails('gold')"><h4>ذهب 🥇</h4><p id="stat-gold">0</p></div>
+            <div class="stat-card" onclick="showDetails('silver')"><h4>فضة 🥈</h4><p id="stat-silver">0</p></div>
+            <div class="stat-card" onclick="showDetails('bronze')"><h4>برونز 🥉</h4><p id="stat-bronze">0</p></div>
+            <div class="stat-card" onclick="showDetails('warning')"><h4>انذارات ⚠️</h4><p id="stat-warn">0</p></div>
+        </div>
+
+        <div id="reportsTabs" style="display:flex; gap:10px; margin-bottom:15px;">
+            <button class="btn-action" id="tabCurrent" onclick="switchTab('current')" style="flex:1;">المهام والتقارير الحالية</button>
+            <button class="btn-action" id="tabCompleted" onclick="switchTab('completed')" style="flex:1; background:var(--dark); color:white;">سجل الواجبات المكتملة 📁</button>
+        </div>
+
+        <div id="reportsList"></div>
+        <div id="completedHwList" style="display:none;"></div>
+    </div>
+</div>
+
+<div id="popup">
+    <div class="popup-box">
+        <h3 id="popupTitle" style="margin-top:0; font-size:15px;">التفاصيل</h3>
+        <div id="popupContent" style="font-size:12px;"></div>
+        <button class="btn-action" style="margin-top:15px; padding: 10px; font-size: 13px;" onclick="closePopup()">إغلاق</button>
+    </div>
+</div>
+
+<div id="parentCallModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); align-items: center; justify-content: center; z-index: 3000; padding: 15px; backdrop-filter: blur(6px);">
+    <div class="popup-box" style="text-align: center;">
+        <h3 style="color: #7c3aed; margin-top:0; font-size: 15px;">📢 نظام المناداة والحضور التعاوني</h3>
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">أبلغ المدرسة بحالة حضور الطالب أو انصرافه لحظياً</p>
+        
+        <div style="background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 15px; text-align: right; border: 1px solid #e2e8f0;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                <input type="checkbox" id="optionalNameCall" checked style="width: 14px; height: 14px; accent-color: var(--primary);">
+                رفع اسم الطالب في شاشة المناداة الصوتية والمكتوبة للمدرسة
+            </label>
+        </div>
+
+        <div class="form-group" style="text-align: right; margin-bottom: 15px;">
+            <label style="font-size: 12px; font-weight: 700;">اختر البوابة أو الموقع للانتظار:</label>
+            <select id="parentGateSelect" class="inp" style="margin-top: 5px; font-size: 13px; padding: 10px;">
+                <option value="بوابة رقم 1">بوابة رقم 1</option>
+                <option value="بوابة رقم 2">بوابة رقم 2</option>
+                <option value="بوابة رقم 3">بوابة رقم 3</option>
+            </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+            <button class="btn-action" style="padding: 10px; font-size: 12px; background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="selectActionType('on_the_way', 'في الطريق للمدرسة 🚗')">🚗 أنا في الطريق للمدرسة</button>
+            <button class="btn-action" style="padding: 10px; font-size: 12px; background: linear-gradient(135deg, #10b981, #059669);" onclick="selectActionType('arrived', 'وصلت البوابة وأنتظر المناداة 🏫')">🏫 وصلت البوابة (بدء المناداة)</button>
+            <button class="btn-action" style="padding: 10px; font-size: 12px; background: linear-gradient(135deg, #f97316, #c2410c);" onclick="selectActionType('late_emergency', 'تأخر بسبب ظرف طارئ / عطل 🚨')">🚨 متأخر (ظرف طارئ / عطل في السيارة)</button>
+            <button class="btn-action" style="padding: 10px; font-size: 12px; background: linear-gradient(135deg, #6366f1, #4338ca);" onclick="selectActionType('pickup_later', 'تأخر في الاستلام (سأحضر بعد دقائق) ⏳')">⏳ سأحضر لاستلاستلام الطالب خلال 15 دقيقة</button>
+            <button class="btn-action" style="padding: 10px; font-size: 12px; background: linear-gradient(135deg, #ef4444, #dc2626);" onclick="selectActionType('absent', 'اعتذار عن غياب اليوم 🚫')">🚫 إبلاغ عن غياب اليوم</button>
+        </div>
+
+        <div id="confirmActionBox" class="confirm-box">
+            <div style="font-weight: 800; color: #b45309; margin-bottom: 6px;">⚠️ تأكيد الإرسال:</div>
+            <div id="confirmActionText" style="margin-bottom: 10px; color: #1e293b;">هل أنت متأكد من رغبتك في إرسال: (...)</div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-action" style="flex:1; padding: 8px; background: #10b981; font-size: 11px;" onclick="confirmAndSendAction()">نعم، تأكيد وإرسال ✅</button>
+                <button class="btn-action" style="flex:1; padding: 8px; background: #64748b; font-size: 11px;" onclick="cancelConfirmAction()">إلغاء ❌</button>
+            </div>
+        </div>
+
+        <div id="parentCallStatusMsg" style="font-size: 11px; font-weight: bold; color: #10b981; margin-bottom: 15px; display: none;"></div>
+        
+        <button class="btn-action" style="padding: 10px; font-size: 12px; background: var(--dark);" onclick="closeParentCallModal()">إغلاق</button>
+    </div>
+</div>
+
+<!-- النافذة التفاعلية للمهام -->
+<div id="unifiedAssessmentModal" class="interactive-modal">
+    <div class="modal-content-unified">
+        <div class="modal-header-unified">
+            <h3 id="assessmentModalTitle">عنوان التقييم</h3>
+            <button class="close-modal-unified" onclick="closeAssessmentModal()">إغلاق ✖</button>
+        </div>
+        
+        <div class="modal-body-unified">
+            <div class="assessment-progress-wrapper">
+                <div id="assessmentProgressFill" class="assessment-progress-fill"></div>
+            </div>
+            <div class="assessment-progress-label">
+                <span id="assessmentProgressText">تم الإجابة على: 0 من 0 (0%)</span>
+                <span>شريط تقدم حل المهام ⚡</span>
+            </div>
+
+            <div id="interactiveLayoutContainer" class="interactive-layout">
+                <div id="videoContainer" class="video-player-container">
+                    <video id="assessmentVideo" class="video-player" controls>
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+                
+                <div id="assessmentQuestionsArea" class="questions-area"></div>
+            </div>
+            
+            <button class="submit-assessment-btn" id="submitAssessmentBtn" onclick="submitAssessment()">تسليم الإجابات واعتماد النتيجة ✅</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCIW17B6y6sG_bdUFqF7FWoVIY9ynXv1B4",
+        authDomain: "myschoolproject-4ad92.firebaseapp.com",
+        databaseURL: "https://myschoolproject-4ad92-default-rtdb.firebaseio.com",
+        projectId: "myschoolproject-4ad92",
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const database = firebase.database();
+
+    const levelNames = { 'exc': 'متميز ✨', 'cre': 'مبدع 🎨', 'vg': 'جيد جداً 👍', 'fa': 'مقبول 🆗', 'we': 'ضعيف 📉' };
+    const warnNames = { 'yellow': 'انذار أول 🟨', 'red': 'انذار أخير 🟥', 'warning': 'خصم درجة 📌' };
+    const awardNames = { 'gold': 'الميدالية الذهبية 🥇', 'silver': 'الميدالية الفضية 🥈', 'bronze': 'الميدالية البرونزية 🥉' };
+
+    const EVAL_WEIGHTS = {
+        'exc': 2, 'cre': 4, 'creative': 4, 'vg': 1, 'fa': 0, 'we': -2, 'weak': -2,
+        'gold': 5, 'silver': 3, 'bronze': 1, 'warn': -3
+    };
+
+    let studentSubjectsData = {
+        'اللغة العربية': { icon: '✍️', score: 0, skills: [] },
+        'الرياضيات': { icon: '📐', score: 0, skills: [] },
+        'العلوم': { icon: '🧬', score: 0, skills: [] },
+        'الدراسات الإسلامية': { icon: '📖', score: 0, skills: [] },
+        'اللغة الإنجليزية': { icon: '🔤', score: 0, skills: [] }
+    };
+
+    let schoolAssessments = []; 
+    let studentResults = {}; 
+    let currentActiveAssessment = null;
+
+    let allEvals = [];
+    let isNafessActive = false;
+    
+    let globalStudent = null; let globalStudentKey = null; let globalSchoolId = null; let globalClassName = null;
+    let pendingActionKey = null; let pendingActionDesc = null;
+
+    /* ======= متغيرات مسار التعلم وخطة المذاكرة التفاعلية ======= */
+    let liveCurriculumPaths = {};
+    let liveStudyPlans = {};
+
+    function getSubjectColor(subj) {
+        if(!subj) return '#6366f1';
+        if(subj.includes('رياضيات')) return '#3b82f6';
+        if(subj.includes('لغت') || subj.includes('عربي')) return '#10b981';
+        if(subj.includes('علوم')) return '#f59e0b';
+        if(subj.includes('انجل') || subj.includes('إنجل')) return '#8b5cf6';
+        if(subj.includes('قرآن') || subj.includes('اسلام') || subj.includes('إسلام') || subj.includes('توحيد') || subj.includes('فقه')) return '#14b8a6';
+        return '#6366f1';
+    }
+
+    function renderLearningPath() {
+        let totalCurrent = 0;
+        let totalTarget = 0;
+        let pathsHtml = "";
+
+        for (let subj in liveCurriculumPaths) {
+            let books = liveCurriculumPaths[subj];
+            let subjColor = getSubjectColor(subj);
+            
+            for (let bKey in books) {
+                let bData = books[bKey];
+                let tPage = parseInt(bData.totalPages) || 0;
+                let cPage = parseInt(bData.currentPage) || 0;
+                
+                if (tPage > 0) {
+                    totalCurrent += cPage;
+                    totalTarget += tPage;
+                    let subPct = Math.min(100, Math.round((cPage / tPage) * 100));
+                    let bName = bData.pathName || (bKey === 'studentBook' ? 'كتاب الطالب' : (bKey === 'activityBook' ? 'كتاب النشاط' : 'مسار مخصص'));
+
+                    pathsHtml += `
+                        <div class="sub-path-item">
+                            <div class="sub-path-label">
+                                <span>${subj} - ${bName} <small style="color:var(--text-muted)">(وقوف المعلم: ص ${cPage})</small></span>
+                                <span style="color: ${subjColor}">${subPct}%</span>
+                            </div>
+                            <div class="sub-path-track">
+                                <div class="sub-path-fill" style="width: ${subPct}%; background: ${subjColor};"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        let overallPct = totalTarget > 0 ? Math.min(100, Math.round((totalCurrent / totalTarget) * 100)) : 0;
+        
+        document.getElementById('overallPathPctText').innerText = overallPct + '%';
+        document.getElementById('overallPathDesc').innerHTML = `التقدم الإجمالي: تم تغطية مسار التعلم بمتوسط <b>${overallPct}%</b> في جميع المواد وفقاً لتحديد المعلم.`;
+        document.getElementById('mainPathFill').style.width = overallPct + '%';
+        
+        if(pathsHtml === "") {
+            pathsHtml = `<div style="text-align:center; font-size:12px; color:var(--text-muted); padding:10px;">لم يتم تحديد مسارات للمنهج حتى الآن من قِبل المعلم.</div>`;
+        }
+        document.getElementById('subjectPathsContainer').innerHTML = pathsHtml;
+    }
+
+    function toggleLearningPath() {
+        const container = document.getElementById('subjectPathsContainer');
+        if(container.style.display === 'block') {
+            container.style.display = 'none';
+        } else {
+            container.style.display = 'block';
+        }
+    }
+
+    function renderStudentStudyPlan() {
+        const dropdownListContainer = document.getElementById('navbarPlanList');
+        if (!dropdownListContainer) return;
+        dropdownListContainer.innerHTML = '';
+        
+        let completedCount = 0;
+        let activePlans = [];
+        let latestPlans = {};
+
+        for(let key in liveStudyPlans) {
+            let p = liveStudyPlans[key];
+            let gKey = p.subject + "_" + p.bookType;
+            if(!latestPlans[gKey] || latestPlans[gKey].timestamp < p.timestamp) {
+                latestPlans[gKey] = { id: key, ...p };
+            }
+        }
+
+        activePlans = Object.values(latestPlans).sort((a,b) => b.timestamp - a.timestamp);
+
+        if(activePlans.length === 0) {
+            dropdownListContainer.innerHTML = `<div style="text-align:center; font-size:12px; color:var(--text-muted); padding:10px;">لا توجد خطط مذاكرة مسجلة أو نشطة حالياً.</div>`;
+            let dropFill = document.getElementById('dropdownPlanProgressFill');
+            if(dropFill) dropFill.style.width = '0%';
+            let countBadge = document.getElementById('navbarPlanCount');
+            if(countBadge) countBadge.innerText = '0';
+            return;
+        }
+
+        activePlans.forEach(plan => {
+            let isCompleted = localStorage.getItem('plan_' + globalStudentKey + '_' + plan.id) === 'true';
+            if(isCompleted) completedCount++;
+            
+            let badgeColor = getSubjectColor(plan.subject);
+            let bName = plan.bookName || 'الكتاب';
+            let taskDesc = `مذاكرة ${bName} (صـ ${plan.pageFrom} - صـ ${plan.pageTo})`;
+            if(plan.teacherPage) taskDesc += ` <br><small style="color:var(--primary); font-weight:bold;">المعلم وقف عند صـ ${plan.teacherPage}</small>`;
+
+            let itemHtml = `
+                <div class="plan-item-box ${isCompleted ? 'completed' : ''}" id="drop_plan_box_${plan.id}">
+                    <div class="plan-item-info">
+                        <span class="plan-subj-badge" style="background: ${badgeColor}20; color: ${badgeColor};">${plan.subject}</span>
+                        <span class="plan-desc">${taskDesc}</span>
+                        <small style="font-size:9px; color:var(--text-muted);">${plan.date}</small>
+                    </div>
+                    <label class="plan-checkbox-wrap">
+                        <input type="checkbox" ${isCompleted ? 'checked' : ''} onchange="togglePlanItem('${plan.id}', this.checked)">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            `;
+            dropdownListContainer.innerHTML += itemHtml;
+        });
+
+        let pct = activePlans.length > 0 ? Math.round((completedCount / activePlans.length) * 100) : 0;
+        let dropFill = document.getElementById('dropdownPlanProgressFill');
+        if(dropFill) dropFill.style.width = pct + '%';
+        
+        let pendingCount = activePlans.length - completedCount;
+        let countBadge = document.getElementById('navbarPlanCount');
+        if(countBadge) countBadge.innerText = pendingCount;
+    }
+
+    function togglePlanItem(planId, isChecked) {
+        localStorage.setItem('plan_' + globalStudentKey + '_' + planId, isChecked);
+        renderStudentStudyPlan(); 
+        if(isChecked) {
+            let dropBox = document.getElementById('drop_plan_box_' + planId);
+            if(dropBox) {
+                dropBox.style.transform = 'scale(1.02)';
+                setTimeout(() => dropBox.style.transform = 'scale(1)', 200);
+            }
+        }
+    }
+
+    function toggleTasksNavbarDropdown() {
+        const drop = document.getElementById('navbarTasksDropdown');
+        drop.classList.toggle('show');
+        document.getElementById('navbarPlanDropdown').classList.remove('show');
+    }
+
+    function togglePlanNavbarDropdown() {
+        const drop = document.getElementById('navbarPlanDropdown');
+        drop.classList.toggle('show');
+        document.getElementById('navbarTasksDropdown').classList.remove('show');
+    }
+
+    /* ======================================================================= */
+
+    function cleanString(str) {
+        if(!str) return "";
+        return str.toString().replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }).trim();
+    }
+
+    function fetchAndRenderAssessments() {
+        if (!globalSchoolId || !globalStudentKey) return;
+        
+        database.ref('assessments/' + globalSchoolId).on('value', snap => {
+            const data = snap.val() || {};
+            schoolAssessments = [];
+            for (let key in data) {
+                let asm = data[key];
+                if(asm.targetClass === 'all' || asm.targetClass === globalClassName) {
+                    schoolAssessments.push({ id: key, ...asm });
+                }
+            }
+            
+            database.ref('assessment_results/' + globalSchoolId + '/' + globalStudentKey).on('value', resSnap => {
+                studentResults = resSnap.val() || {};
+                renderTasksListHTML(); 
+                updateNavbarTasksCounter();
+                updateOverallIndicator();
+            });
+        });
+    }
+
+    function updateNavbarTasksCounter() {
+        const countBadge = document.getElementById('navbarTasksCount');
+        let uncompleted = 0;
+        schoolAssessments.forEach(asm => {
+            if (!studentResults[asm.id]) uncompleted++;
+        });
+        countBadge.innerText = schoolAssessments.length;
+    }
+
+    function renderTasksListHTML() {
+        const listContainer = document.getElementById('navbarTasksList');
+        listContainer.innerHTML = '';
+        
+        if (schoolAssessments.length === 0) {
+            listContainer.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">لا توجد مهام أو تقييمات مسجلة حالياً لفصلك.</div>';
+            return;
+        }
+
+        schoolAssessments.forEach((asm) => {
+            let isTest = asm.type === 'test';
+            let tagText = isTest ? 'اختبار 🎯' : 'مهمة مرئية 🎬';
+            let resultData = studentResults[asm.id];
+            let isCompleted = !!resultData;
+            
+            let btnHtml = "";
+            let performanceHtml = "";
+            
+            if (isCompleted) {
+                let lvl = resultData.scorePercentage >= 85 ? 'ممتاز ✨' : (resultData.scorePercentage >= 65 ? 'جيد جداً 👍' : 'يُطور 📉');
+                let color = resultData.scorePercentage >= 85 ? '#15803d' : (resultData.scorePercentage >= 65 ? '#1e40af' : '#dc2626');
+                
+                performanceHtml = `<span style="font-size: 11px; font-weight: bold; color: ${color};">النتيجة: ${lvl} (${Math.round(resultData.scorePercentage)}%)</span>`;
+                btnHtml = `<span style="display:inline-block; background:#10b981; color:white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: bold;">مكتملة ✅</span>`;
+            } else {
+                performanceHtml = `<span style="font-size: 11px; color: var(--text-muted);">بانتظار الحل</span>`;
+                let btnClass = isTest ? 'btn-start-test' : 'btn-start-task';
+                let btnText = isTest ? 'بدء الاختبار' : 'بدء التقييم';
+                btnHtml = `<button class="${btnClass}" style="width: auto; padding: 6px 12px; border-radius: 8px; font-size: 11px;" onclick="openAssessmentModal('${asm.id}')">${btnText}</button>`;
+            }
+
+            listContainer.innerHTML += `
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                            <h4 style="margin: 0; font-size: 13px; color: #1e293b;">${asm.title}</h4>
+                            <span style="background: ${isTest ? '#d1fae5' : '#e0f2fe'}; color: ${isTest ? '#059669' : '#0284c7'}; padding: 2px 6px; border-radius: 6px; font-size: 9px; font-weight: bold;">${tagText}</span>
+                        </div>
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">مادة: ${asm.subject || 'عام'} | وزن التقييم: ${asm.weight}%</div>
+                        ${performanceHtml}
+                    </div>
+                    <div>
+                        ${btnHtml}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function openAssessmentModal(id) {
+        currentActiveAssessment = schoolAssessments.find(a => a.id === id);
+        if(!currentActiveAssessment) return;
+
+        document.getElementById('assessmentModalTitle').innerText = currentActiveAssessment.title;
+        
+        let layoutContainer = document.getElementById('interactiveLayoutContainer');
+        let vCont = document.getElementById('videoContainer');
+        let vPlayer = document.getElementById('assessmentVideo');
+        
+        if (currentActiveAssessment.type === 'task' && currentActiveAssessment.videoUrl) {
+            vCont.style.display = 'block';
+            vPlayer.src = currentActiveAssessment.videoUrl;
+            layoutContainer.classList.add('has-video');
+        } else {
+            vCont.style.display = 'none';
+            vPlayer.pause();
+            vPlayer.src = '';
+            layoutContainer.classList.remove('has-video');
+        }
+
+        let qArea = document.getElementById('assessmentQuestionsArea');
+        qArea.innerHTML = '';
+
+        if (currentActiveAssessment.questions && currentActiveAssessment.questions.length > 0) {
+            currentActiveAssessment.questions.forEach((q, qIndex) => {
+                let optsHtml = q.options.map((opt, oIndex) => `
+                    <label class="q-opt-label">
+                        <input type="radio" name="q_${qIndex}" value="${oIndex}" onchange="updateAssessmentProgress()"> ${opt}
+                    </label>
+                `).join('');
+                
+                optsHtml += `
+                    <label class="q-opt-label skip-opt">
+                        <input type="radio" name="q_${qIndex}" value="-1" onchange="updateAssessmentProgress()"> ⏭️ تجاوز السؤال
+                    </label>
+                `;
+
+                let pauseHint = (currentActiveAssessment.type === 'task' && q.stopTime > 0) ? `<small style="display:block; color:var(--primary); margin-bottom:5px;">(للثانية: ${q.stopTime})</small>` : '';
+
+                qArea.innerHTML += `
+                    <div class="q-card" id="q_card_${qIndex}">
+                        ${pauseHint}
+                        <div class="q-text">${qIndex + 1}- ${q.text}</div>
+                        <div class="q-options">${optsHtml}</div>
+                    </div>
+                `;
+            });
+        } else {
+            qArea.innerHTML = '<div style="text-align:center; font-size:12px; padding:20px;">لا توجد أسئلة مسجلة لهذا التقييم.</div>';
+        }
+
+        updateAssessmentProgress();
+        document.getElementById('unifiedAssessmentModal').style.display = 'flex';
+    }
+
+    function updateAssessmentProgress() {
+        if (!currentActiveAssessment || !currentActiveAssessment.questions) return;
+        const total = currentActiveAssessment.questions.length;
+        let answered = 0;
+        currentActiveAssessment.questions.forEach((q, idx) => {
+            const sel = document.querySelector(`input[name="q_${idx}"]:checked`);
+            if (sel) answered++;
+        });
+        const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+        document.getElementById('assessmentProgressFill').style.width = pct + '%';
+        document.getElementById('assessmentProgressText').innerText = `تم الإجابة على: ${answered} من ${total} (${pct}%)`;
+    }
+
+    function closeAssessmentModal() {
+        document.getElementById('unifiedAssessmentModal').style.display = 'none';
+        document.getElementById('assessmentVideo').pause();
+        currentActiveAssessment = null;
+    }
+
+    function submitAssessment() {
+        if(!currentActiveAssessment) return;
+
+        let totalQuestions = currentActiveAssessment.questions ? currentActiveAssessment.questions.length : 0;
+        if(totalQuestions === 0) {
+            closeAssessmentModal(); return;
+        }
+
+        let correctAnswers = 0;
+        let allAnswered = true;
+
+        currentActiveAssessment.questions.forEach((q, qIndex) => {
+            let selected = document.querySelector(`input[name="q_${qIndex}"]:checked`);
+            if(!selected) {
+                allAnswered = false;
+            } else {
+                if (parseInt(selected.value) !== -1 && parseInt(selected.value) === q.correctIndex) {
+                    correctAnswers++;
+                }
+            }
+        });
+
+        if(!allAnswered) {
+            alert("الرجاء الإجابة على جميع الأسئلة أو اختيار 'تجاوز السؤال' قبل التسليم!");
+            return;
+        }
+
+        let scorePct = (correctAnswers / totalQuestions) * 100;
+        
+        let resultData = {
+            scorePercentage: scorePct,
+            correctCount: correctAnswers,
+            totalQuestions: totalQuestions,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        database.ref('assessment_results/' + globalSchoolId + '/' + globalStudentKey + '/' + currentActiveAssessment.id).set(resultData)
+        .then(() => {
+            alert(`تم اعتماد الإجابات وإغلاق المهمة بنجاح!\nنتيجتك: ${correctAnswers} من ${totalQuestions} (${Math.round(scorePct)}%)`);
+            closeAssessmentModal();
+        });
+    }
+
+    function updateOverallIndicator() {
+        let totalAssignedWeight = 0;
+        let accumulatedScore = 0;
+
+        schoolAssessments.forEach(asm => {
+            let w = asm.weight || 0;
+            totalAssignedWeight += w;
+            
+            let res = studentResults[asm.id];
+            if (res) {
+                accumulatedScore += (res.scorePercentage * (w / 100));
+            }
+        });
+
+        let finalPercent = totalAssignedWeight > 0 ? Math.round((accumulatedScore / totalAssignedWeight) * 100) : 0;
+        
+        let fill = document.getElementById('overallEnergyFill');
+        let badge = document.getElementById('overallLevelBadge');
+        
+        fill.style.width = finalPercent + '%';
+        fill.innerText = finalPercent + '%';
+
+        if(finalPercent >= 85) {
+            fill.style.background = 'linear-gradient(90deg, #3b82f6, #10b981)';
+            badge.innerText = `مستوى ممتاز ✨`;
+            badge.style.color = '#15803d'; badge.style.background = '#dcfce7';
+        } else if(finalPercent >= 60) {
+            fill.style.background = 'linear-gradient(90deg, #f59e0b, #3b82f6)';
+            badge.innerText = `مستوى متقدم 👍`;
+            badge.style.color = '#1e40af'; badge.style.background = '#dbeafe';
+        } else if(finalPercent > 0) {
+            fill.style.background = 'linear-gradient(90deg, #ef4444, #f59e0b)';
+            badge.innerText = `مستوى مقبول 🆗`;
+            badge.style.color = '#b45309'; badge.style.background = '#fef3c7';
+        } else {
+            fill.style.background = '#94a3b8';
+            badge.innerText = `بانتظار التقييمات 📌`;
+            badge.style.color = '#475569'; badge.style.background = '#f1f5f9';
+        }
+        
+        updateSubjectsScoresLocally();
+    }
+    
+    function updateSubjectsScoresLocally() {
+        Object.keys(studentSubjectsData).forEach(subj => studentSubjectsData[subj].score = 0);
+        let subjWeights = {};
+
+        schoolAssessments.forEach(asm => {
+            let s = asm.subject || 'عام';
+            if(studentSubjectsData[s]) {
+                let w = asm.weight || 0;
+                if(!subjWeights[s]) subjWeights[s] = { totalW: 0, accumS: 0 };
+                subjWeights[s].totalW += w;
+                
+                let res = studentResults[asm.id];
+                if(res) {
+                    subjWeights[s].accumS += (res.scorePercentage * (w / 100));
+                }
+            }
+        });
+
+        Object.keys(subjWeights).forEach(s => {
+            let pct = subjWeights[s].totalW > 0 ? (subjWeights[s].accumS / subjWeights[s].totalW) * 100 : 0;
+            if(studentSubjectsData[s]) studentSubjectsData[s].score = Math.round(pct);
+        });
+
+        renderSubjectsCards();
+    }
+
+    function renderSubjectsCards() {
+        const container = document.getElementById('subjectsCardsContainer');
+        container.innerHTML = '';
+
+        Object.keys(studentSubjectsData).forEach(subjName => {
+            let subj = studentSubjectsData[subjName];
+            
+            let color = subj.score >= 85 ? '#10b981' : (subj.score >= 60 ? '#3b82f6' : (subj.score > 0 ? '#f59e0b' : '#94a3b8'));
+            let lvlText = subj.score >= 85 ? 'متميز' : (subj.score >= 60 ? 'جيد جداً' : (subj.score > 0 ? 'مقبول' : 'لا يوجد قياس'));
+
+            let frontContent = `
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="font-size: 18px;">${subj.icon}</span>
+                    <strong style="font-size: 12px;">${subjName}</strong>
+                </div>
+                <div style="width: 100%; text-align:right;">
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px; font-weight:bold;">
+                        <span>الإتقان: ${subj.score}%</span>
+                        <span style="color:${color}">${lvlText}</span>
+                    </div>
+                    <div class="energy-bar-wrapper" style="height: 6px;">
+                        <div class="energy-bar-fill" style="width: ${subj.score}%; background: ${color};"></div>
+                    </div>
+                </div>
+            `;
+
+            let cardEl = document.createElement('div');
+            cardEl.className = 'subject-card-static';
+            cardEl.innerHTML = frontContent;
+            cardEl.onclick = () => alert(`تفاصيل مادة ${subjName}`);
+            container.appendChild(cardEl);
+        });
+    }
+
+    function processClassRankings(studentsArray, evalsData) {
+        let list = studentsArray.map(st => {
+            let studentEvals = evalsData[st.key] || {};
+            let totalPoints = 0;
+            let counts = { exc: 0, cre: 0, vg: 0, fa: 0, we: 0, gold: 0, silver: 0, bronze: 0, warn: 0 };
+
+            Object.values(studentEvals).forEach(ev => {
+                if (ev.level === 'exc') { totalPoints += EVAL_WEIGHTS.exc; counts.exc++; }
+                if (ev.level === 'cre' || ev.level === 'creative') { totalPoints += EVAL_WEIGHTS.cre; counts.cre++; }
+                if (ev.level === 'vg') { totalPoints += EVAL_WEIGHTS.vg; counts.vg++; }
+                if (ev.level === 'fa') { totalPoints += EVAL_WEIGHTS.fa; counts.fa++; }
+                if (ev.level === 'we' || ev.level === 'weak') { totalPoints += EVAL_WEIGHTS.we; counts.we++; }
+                if (ev.award === 'gold') { totalPoints += EVAL_WEIGHTS.gold; counts.gold++; }
+                if (ev.award === 'silver') { totalPoints += EVAL_WEIGHTS.silver; counts.silver++; }
+                if (ev.award === 'bronze') { totalPoints += EVAL_WEIGHTS.bronze; counts.bronze++; }
+                if (ev.warning) { totalPoints += EVAL_WEIGHTS.warn; counts.warn++; }
+            });
+
+            return { ...st, points: totalPoints, counts };
+        });
+
+        list.sort((a, b) => b.points - a.points);
+        const maxPointsInClass = Math.max(...list.map(s => s.points), 10);
+
+        return list.map((st, idx, arr) => {
+            const nextStudent = arr[idx + 1];
+            const diffToNext = nextStudent ? (st.points - nextStudent.points) : 0;
+            const energyPct = Math.min(100, Math.max(5, (st.points / maxPointsInClass) * 100));
+
+            return { ...st, actualRank: idx + 1, diffToNext: diffToNext, hasNextStudent: !!nextStudent, energyPct: energyPct };
+        });
+    }
+
+    function login() {
+        const u = cleanString(document.getElementById('userInput').value).toLowerCase();
+        
+        database.ref('students').orderByChild('studentUser').equalTo(u).once('value', snap => {
+            if(snap.exists()) {
+                let data = snap.val();
+                let sK = Object.keys(data)[0]; 
+                let found = data[sK];
+                let cl = found.className;
+                let sId = found.schoolId;
+                
+                globalStudent = found;
+                globalStudentKey = sK;
+                globalSchoolId = sId;
+                globalClassName = cl;
+
+                registerParentView(sK);
+                database.ref('tenants/' + sId).once('value', tSnap => {
+                    let sName = tSnap.val()?.schoolName || "المدرسة المسجلة";
+                    loadData(found, sK, cl, sName);
+                });
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        });
+    }
+
+    function registerParentView(sKey) {
+        const now = new Date();
+        const formattedTime = now.toLocaleDateString('ar-SA') + ' - ' + now.toLocaleTimeString('ar-SA');
+        database.ref('students/' + sKey).update({ lastSeen: formattedTime, lastLogin: now.toISOString() });
+    }
+
+    function openParentCallModal() {
+        document.getElementById('confirmActionBox').style.display = 'none';
+        document.getElementById('parentCallModal').style.display = 'flex';
+    }
+
+    function closeParentCallModal() {
+        document.getElementById('parentCallModal').style.display = 'none';
+        document.getElementById('confirmActionBox').style.display = 'none';
+    }
+
+    function selectActionType(actionKey, actionDesc) {
+        pendingActionKey = actionKey;
+        pendingActionDesc = actionDesc;
+        const gate = document.getElementById('parentGateSelect').value;
+        const isNameOptional = document.getElementById('optionalNameCall').checked;
+
+        document.getElementById('confirmActionText').innerHTML = `
+            هل أنت متأكد من إرسال الحالة: <br><b>${actionDesc}</b><br>
+            الموقع: <b>${gate}</b> <br>
+            رفع الاسم في المناداة: <b>${isNameOptional ? 'مفعل (اختياري)' : 'غير مفعل'}</b>
+        `;
+        document.getElementById('confirmActionBox').style.display = 'block';
+    }
+
+    function cancelConfirmAction() {
+        document.getElementById('confirmActionBox').style.display = 'none';
+        pendingActionKey = null;
+        pendingActionDesc = null;
+    }
+
+    function confirmAndSendAction() {
+        if (!globalStudent || !globalSchoolId || !pendingActionKey) {
+            alert("حدث خطأ في البيانات أو لم يتم تحديد إجراء.");
+            return;
+        }
+
+        const gate = document.getElementById('parentGateSelect').value;
+        const optionalNameAllowed = document.getElementById('optionalNameCall').checked;
+        const timestamp = firebase.database.ServerValue.TIMESTAMP;
+
+        let callData = {
+            studentName: globalStudent.studentName,
+            className: globalClassName,
+            schoolId: globalSchoolId,
+            requesterType: 'parent',
+            requesterName: 'ولي الأمر 🚗',
+            destination: pendingActionKey === 'absent' ? 'إبلاغ عن غياب' : gate,
+            actionType: pendingActionKey,
+            actionDesc: pendingActionDesc,
+            includeInCallList: optionalNameAllowed,
+            status: pendingActionKey === 'absent' ? 'absent' : 'pending',
+            timestamp: timestamp
+        };
+
+        database.ref('calls/' + globalSchoolId).push(callData).then(() => {
+            let msgEl = document.getElementById('parentCallStatusMsg');
+            msgEl.style.display = 'block';
+            msgEl.innerText = `✓ تم إرسال الحالة بنجاح: (${pendingActionDesc})`;
+            document.getElementById('confirmActionBox').style.display = 'none';
+            setTimeout(() => {
+                msgEl.style.display = 'none';
+                closeParentCallModal();
+            }, 2500);
+        }).catch(err => {
+            alert("حدث خطأ أثناء الإرسال: " + err.message);
+        });
+    }
+
+    function toggleNafessView() {
+        const reportsView = document.getElementById('reportsView');
+        const nafessView = document.getElementById('nafessView');
+        const toggleBtn = document.getElementById('toggleNafessBtn');
+
+        if (!isNafessActive) {
+            reportsView.style.display = 'none';
+            nafessView.style.display = 'block';
+            toggleBtn.innerText = "📋 العودة للتقارير الشاملة";
+            toggleBtn.style.background = "var(--dark)";
+            isNafessActive = true;
+        } else {
+            nafessView.style.display = 'none';
+            reportsView.style.display = 'block';
+            toggleBtn.innerText = "🎯 بوابة نافس المحاكية";
+            toggleBtn.style.background = "linear-gradient(135deg, #f59e0b, #ea580c)";
+            isNafessActive = false;
+        }
+    }
+
+    function buildWeeksGrid(currentWeek) {
+        const container = document.getElementById('weeksContainer');
+        container.innerHTML = '';
+        for (let i = 1; i <= 16; i++) {
+            let statusClass = "";
+            let text = "أسبوع " + i;
+            if (i < currentWeek) { statusClass = "completed"; text = i + " ✓"; } 
+            else if (i === currentWeek) { statusClass = "current"; }
+            container.innerHTML += `<div class="week-item ${statusClass}">${text}</div>`;
+        }
+    }
+
+    function switchTab(tab) {
+        if(tab === 'current') {
+            document.getElementById('reportsList').style.display = 'block';
+            document.getElementById('completedHwList').style.display = 'none';
+            document.getElementById('tabCurrent').style.background = 'linear-gradient(135deg,var(--primary),var(--secondary))';
+            document.getElementById('tabCompleted').style.background = 'var(--dark)';
+        } else {
+            document.getElementById('reportsList').style.display = 'none';
+            document.getElementById('completedHwList').style.display = 'block';
+            document.getElementById('tabCompleted').style.background = 'linear-gradient(135deg,var(--primary),var(--secondary))';
+            document.getElementById('tabCurrent').style.background = 'var(--dark)';
+        }
+    }
+
+    function loadData(student, sKey, cls, schoolName) {
+        document.getElementById('loginArea').style.display='none';
+        document.getElementById('reportDashboard').style.display='block';
+        
+        document.getElementById('stdName').innerText = student.studentName;
+        document.getElementById('stdClass').innerText = `المدرسة: ${schoolName} | الفصل: ${cls}`;
+        document.getElementById('seenBadgeLocation').innerHTML = `<div class="seen-status-container">✓ تم تأكيد اطلاعك على التقارير للإدارة</div>`;
+
+        fetchAndRenderAssessments();
+        
+        // استدعاء بيانات مسار التعلم وخطة المذاكرة التفاعلية
+        database.ref('curriculumPaths/' + cls).on('value', snap => {
+            liveCurriculumPaths = snap.val() || {};
+            renderLearningPath();
+        });
+
+        database.ref('studyPlans/' + cls).on('value', snap => {
+            liveStudyPlans = snap.val() || {};
+            renderStudentStudyPlan();
+        });
+
+        database.ref('students').orderByChild('className').equalTo(cls).once('value', stdSnap => {
+            const classStds = stdSnap.val() || {};
+            let classStudents = [];
+            for(let k in classStds) {
+                classStudents.push({ key: k, ...classStds[k], name: classStds[k].studentName });
+            }
+
+            database.ref('evaluations/'+cls).once('value', evSnap => {
+                const evalsData = evSnap.val() || {};
+                const rankedList = processClassRankings(classStudents, evalsData);
+                const myData = rankedList.find(s => s.key === sKey);
+
+                if(myData) {
+                    const diffText = myData.hasNextStudent ? `الفرق عن التالي: +${myData.diffToNext} نقطة` : `المركز الأخير بالفصل`;
+                    document.getElementById('stdRank').outerHTML = `
+                        <div id="stdRank" class="rank-card-compact">
+                            <div class="rank-num-box">الترتيب #${myData.actualRank}</div>
+                            <div class="diff-box">📊 ${diffText}</div>
+                        </div>
+                    `;
+
+                    const leadBody = document.getElementById('leaderboardBody');
+                    leadBody.innerHTML = '';
                     
-                    <div class="teacher-service-card madrasati-theme active-inner-card" onclick="moveInnerCard(0)">
-                        <div class="fav-btn" onclick="toggleFavorite(this, event)"><i class="fa-solid fa-star"></i></div>
-                        <div class="inner-card-body">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                            <h4>منصة مدرستي</h4>
-                            <p>رصد الحصص والتحضير الذكي السريع للمقررات والواجبات الإثرائية عبر حساب مايكروسوفت الوزاري الرسمي الموحد.</p>
-                            <span class="fav-badge">المفضلة الحالية</span>
-                        </div>
-                        <a href="https://mysignins.microsoft.com/register?requirement=RegistrationCampaign&authMethods=128&authMethodCount=1" target="_blank" class="btn-launch">
-                            <span>فتح الرابط الرسمي</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        </a>
-                    </div>
+                    rankedList.slice(0, 3).forEach((st, idx) => {
+                        let tr = document.createElement('tr');
+                        if(st.key === sKey) tr.className = 'leaderboard-row-current';
+                        let rankClass = (idx === 0) ? 'rank-num first' : 'rank-num';
+                        tr.innerHTML = `
+                            <td><span class="${rankClass}">${st.actualRank}</span></td>
+                            <td>${st.name} ${st.key === sKey ? '(أنت)' : ''}</td>
+                            <td>
+                                <div class="energy-bar-wrapper" title="طاقة الطالب: ${st.points} نقطة">
+                                    <div class="energy-bar-fill" style="width: ${st.energyPct}%;"></div>
+                                    <span class="energy-bar-text">⚡ ${st.points}</span>
+                                </div>
+                            </td>
+                            <td>${st.counts.gold}</td>
+                        `;
+                        leadBody.appendChild(tr);
+                    });
+                }
+            });
+        });
 
-                    <div class="teacher-service-card" onclick="moveInnerCard(1)">
-                        <div class="fav-btn" onclick="toggleFavorite(this, event)"><i class="fa-solid fa-star"></i></div>
-                        <div class="inner-card-body">
-                            <i class="fa-solid fa-calendar-check"></i>
-                            <h4>الغياب اليومي</h4>
-                            <p>تسجيل ورصد الحضور والغياب المباشر مع إرسال إشعارات فورية لغرفة الإدارة وأولياء الأمور لطلاب الفصول الموكلة إليك اليوم.</p>
-                            <span class="fav-badge">المفضلة الحالية</span>
-                        </div>
-                        <div class="btn-launch"><span>ابدأ الرصد الآن</span><i class="fa-solid fa-chevron-left"></i></div>
-                    </div>
-
-                    <div class="teacher-service-card" onclick="moveInnerCard(2)">
-                        <div class="fav-btn" onclick="toggleFavorite(this, event)"><i class="fa-solid fa-star"></i></div>
-                        <div class="inner-card-body">
-                            <i class="fa-solid fa-book-open"></i>
-                            <h4>الجدول المدرسي</h4>
-                            <p>متابعة حصص الأسبوع وتوزيع الخطط الزمنية والمناهج المعتمدة وتلقي تعديلات جدول الانتظار وحصص الاحتياط بدقة.</p>
-                            <span class="fav-badge">المفضلة الحالية</span>
-                        </div>
-                        <div class="btn-launch"><span>عرض الجدول</span><i class="fa-solid fa-chevron-left"></i></div>
-                    </div>
-
-                </div>
-                <div class="dots-container" style="margin-top: 15px;">
-                    <div class="dot active-dot" id="idot0" onclick="moveInnerCard(0)"></div>
-                    <div class="dot" id="idot1" onclick="moveInnerCard(1)"></div>
-                    <div class="dot" id="idot2" onclick="moveInnerCard(2)"></div>
-                </div>
-            </div>
-
-            <div class="section-title">
-                <i class="fa-solid fa-grip" style="color: var(--secondary);"></i>
-                <span>تطبيقات وأدوات مساعدة للمعلم</span>
-            </div>
-
-            <div class="mini-apps-grid">
-                <div class="mini-app-item">
-                    <div class="app-icon-box app-blue"><i class="fa-solid fa-chart-pie"></i></div>
-                    <span>تحليل الأداء</span>
-                </div>
-                <div class="mini-app-item">
-                    <div class="app-icon-box app-purple"><i class="fa-solid fa-id-card-clip"></i></div>
-                    <span>الموهوبين</span>
-                </div>
-                <div class="mini-app-item">
-                    <div class="app-icon-box app-amber"><i class="fa-solid fa-robot"></i></div>
-                    <span>التصحيح الآلي</span>
-                </div>
-                <div class="mini-app-item">
-                    <div class="app-icon-box app-amber" style="background-color: #E0F2FE; color: #0369A1;"><i class="fa-solid fa-star"></i></div>
-                    <span>رصد السلوك</span>
-                </div>
-                <div class="mini-app-item">
-                    <div class="app-icon-box app-blue" style="background-color: #ECFDF5; color: #047857;"><i class="fa-solid fa-file-invoice"></i></div>
-                    <span>التقارير</span>
-                </div>
-                <div class="mini-app-item">
-                    <div class="app-icon-box app-purple" style="background-color: #FFF1F2; color: #BE123C;"><i class="fa-solid fa-envelope"></i></div>
-                    <span>الرسائل</span>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <script>
-        // دالة تحريك كروت الواجهة الخارجية (العرض شامل الـ Margin أصبح 360px)
-        let mainIndex = 0;
-        const mainTrack = document.getElementById('cardTrack');
-        const mainCards = document.querySelectorAll('.wallet-card');
-        const mainDots = document.querySelectorAll('.dot:not([id^="idot"])');
-
-        function moveToCard(index) {
-            mainIndex = index;
-            mainTrack.style.transform = `translateX(${mainIndex * 360}px)`;
-            mainCards.forEach((card, i) => card.classList.toggle('active-card', i === mainIndex));
-            mainDots.forEach((dot, i) => dot.classList.toggle('active-dot', i === mainIndex));
-        }
-
-        function handleCardClick(index) {
-            if (index === mainIndex) {
-                if(index === 0) document.getElementById('teacherPanel').classList.add('open');
-            } else {
-                moveToCard(index);
+        database.ref(`attendance/${cls}`).on('value', snap => {
+            const attData = snap.val();
+            let attHtml = "";
+            if(attData) {
+                const dates = Object.keys(attData).sort().reverse(); 
+                const lastDate = dates[0];
+                const studentAtt = attData[lastDate][sKey];
+                
+                if(studentAtt) {
+                    let statusTxt = 'حاضر ✅'; let bg = '#dcfce7', c = '#166534', br = '#bbf7d0';
+                    if(studentAtt.status === 'absent') { statusTxt = 'غائب ❌'; bg = '#fee2e2'; c = '#991b1b'; br = '#fecaca'; }
+                    if(studentAtt.status === 'late') { statusTxt = 'متأخر ⚠️'; bg = '#fef3c7'; c = '#92400e'; br = '#fde68a'; }
+                    attHtml = `<div style="background: ${bg}; color: ${c}; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid ${br}; display: inline-block; margin-top: 8px;">سجل الحضور (${lastDate}): ${statusTxt}</div>`;
+                }
             }
-        }
+            document.getElementById('attendanceBadge').innerHTML = attHtml;
+        });
 
-        function closeTeacherPanel() { document.getElementById('teacherPanel').classList.remove('open'); }
+        database.ref('schoolSettings/nafess').on('value', snap => {
+            const data = snap.val();
+            const nafessBtn = document.getElementById('toggleNafessBtn');
+            let week = 5;
+            if (data) {
+                week = data.currentWeek ? parseInt(data.currentWeek) : 5;
+                if (data.isActive === false) {
+                    nafessBtn.style.display = 'none';
+                    if (isNafessActive) toggleNafessView();
+                } else { nafessBtn.style.display = 'inline-flex'; }
+            } else { nafessBtn.style.display = 'inline-flex'; }
+            buildWeeksGrid(week);
+        });
 
-        // [تعديل برمجـي] دالة تحريك كروت المعلم الداخلية بناءً على المسافة العملاقة الجديدة (370px شامل الـ Margin)
-        let innerIndex = 0;
-        const innerTrack = document.getElementById('innerTrack');
-        const innerCards = document.querySelectorAll('.teacher-service-card');
+        let isSeenUpdated = false;
 
-        function moveInnerCard(index) {
-            innerIndex = index;
-            innerTrack.style.transform = `translateX(${innerIndex * 370}px)`;
-            innerCards.forEach((card, i) => card.classList.toggle('active-inner-card', i === innerIndex));
+        database.ref('evaluations/'+cls+'/'+sKey).on('value', snap => {
+            const data = snap.val();
+            const list = document.getElementById('reportsList');
+            const compList = document.getElementById('completedHwList');
+            list.innerHTML = ""; compList.innerHTML = "";
             
-            for(let i=0; i<3; i++) {
-                document.getElementById(`idot${i}`).classList.toggle('active-dot', i === innerIndex);
+            let hwStats = { total: 0, done: 0, pending: 0, not_done: 0 };
+            
+            if(!data) { 
+                list.innerHTML = "<div style='text-align:center; padding:50px'>لا توجد سجلات تقارير حالية</div>"; 
+                compList.innerHTML = "<div style='text-align:center; padding:50px'>لا يوجد سجل واجبات مكتملة</div>";
+                updateHwEnergyUI(hwStats);
+                return; 
             }
-        }
+            
+            allEvals = Object.entries(data).map(([k, v]) => ({ id: k, ...v })).reverse();
+            
+            let stats = { exc:0, cre:0, vg:0, fa:0, we:0, gold:0, silver:0, bronze:0, warn:0 };
+            
+            let updates = {};
+            let hasUnseen = false;
 
-        // نظام النجمة وتفضيل كروت المعلم
-        function toggleFavorite(element, event) {
-            event.stopPropagation(); 
-            element.classList.toggle('is-fav');
-            if (element.classList.contains('is-fav')) {
-                element.style.transform = "scale(1.4)";
-                setTimeout(() => element.style.transform = "scale(1.15)", 200);
-            } else {
-                element.style.transform = "scale(1)";
+            allEvals.forEach(ev => {
+                if(!ev.seenByParent && !isSeenUpdated) {
+                    updates[ev.id + '/seenByParent'] = true;
+                    hasUnseen = true;
+                }
+
+                if(ev.level === 'exc') stats.exc++;
+                if(ev.level === 'cre' || ev.level === 'creative') stats.cre++;
+                if(ev.level === 'vg') stats.vg++;
+                if(ev.level === 'fa') stats.fa++;
+                if(ev.level === 'we' || ev.level === 'weak') stats.we++;
+                if(ev.award === 'gold') stats.gold++;
+                if(ev.award === 'silver') stats.silver++;
+                if(ev.award === 'bronze') stats.bronze++;
+                if(ev.warning) stats.warn++;
+
+                let fileBtnHtml = ev.worksheet ? `<div style="margin-top:10px;"><a href="${ev.worksheet}" target="_blank" class="download-btn">📥 تحميل ورقة العمل المرفقة</a></div>` : "";
+                let unitLessonHtml = ev.unitLesson ? `<span class="unit-badge">📖 ${ev.unitLesson}</span>` : `<span class="unit-badge">📖 وحدة الدرس الحالية</span>`;
+
+                let currentHwStatus = ev.hwStatus || 'pending';
+                let hwBtnHtml = "";
+                
+                if (ev.homework && ev.homework.trim() !== '') {
+                    hwStats.total++;
+                    if (currentHwStatus === 'done') {
+                        hwStats.done++;
+                        hwBtnHtml = `<span class="hw-btn hw-done">✅ تم إنجاز الواجب</span>`;
+                    } else if (currentHwStatus === 'not_done') {
+                        hwStats.not_done++;
+                        hwBtnHtml = `<span class="hw-btn hw-pending">❌ لم يتم إنجاز الواجب</span>`;
+                    } else {
+                        hwStats.pending++;
+                        hwBtnHtml = `<span class="hw-btn" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;">⏳ بانتظار تقييم المعلم</span>`;
+                    }
+                }
+
+                let itemHtml = `
+                    <div class="report-item">
+                        <div class="report-header">
+                            <div>
+                                <small style="color:var(--text-muted)">${ev.date} | ${ev.time || ''}</small>
+                                <div style="font-weight:900; font-size:14px; margin-top:5px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                                    <span>مادة: ${ev.subject}</span> ${unitLessonHtml}
+                                </div>
+                            </div>
+                            <span class="badge lvl-${ev.level}">${levelNames[ev.level] || 'تم الرصد'}</span>
+                        </div>
+                        <div style="margin: 8px 0;">
+                            ${ev.award ? `<span class="award-text">🏆 ${awardNames[ev.award]}</span>` : ''}
+                            ${ev.warning ? `<span class="warning-badge">${warnNames[ev.warning]}</span>` : ''}
+                        </div>
+                        <div style="font-size:11px; margin-bottom:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <span>الواجب المطلوب:</span> <strong style="color:var(--primary)">${ev.homework || 'لا يوجد'}</strong>
+                            ${hwBtnHtml}
+                        </div>
+                        <div style="background:#fff; padding:10px; border-radius:10px; font-size:11px; border:1px solid #eee">
+                            💬 ${ev.message || 'لا توجد ملاحظات إضافية'}
+                        </div>
+                        ${fileBtnHtml}
+                    </div>
+                `;
+
+                if(currentHwStatus === 'done') {
+                    compList.innerHTML += itemHtml;
+                } else {
+                    list.innerHTML += itemHtml;
+                }
+            });
+
+            if(hasUnseen && !isSeenUpdated) {
+                database.ref('evaluations/'+cls+'/'+sKey).update(updates);
+                isSeenUpdated = true;
             }
-        }
-    </script>
+
+            updateHwEnergyUI(hwStats);
+
+            document.getElementById('stat-exc').innerText = stats.exc;
+            document.getElementById('stat-cre').innerText = stats.cre;
+            document.getElementById('stat-vg').innerText = stats.vg;
+            document.getElementById('stat-fa').innerText = stats.fa;
+            document.getElementById('stat-we').innerText = stats.we;
+            document.getElementById('stat-gold').innerText = stats.gold;
+            document.getElementById('stat-silver').innerText = stats.silver;
+            document.getElementById('stat-bronze').innerText = stats.bronze;
+            document.getElementById('stat-warn').innerText = stats.warn;
+            document.getElementById('nafessGoldCount').innerText = stats.gold;
+        });
+    }
+
+    function updateHwEnergyUI(hwStats) {
+        let hwPercent = hwStats.total > 0 ? Math.round((hwStats.done / hwStats.total) * 100) : 0;
+        document.getElementById('hwEnergyText').innerText = hwPercent + '%';
+        document.getElementById('hwEnergyFill').style.width = hwPercent + '%';
+        document.getElementById('hwEnergyFill').style.background = hwPercent >= 50 ? 'linear-gradient(90deg, #3b82f6, #10b981)' : 'linear-gradient(90deg, #ef4444, #f59e0b)';
+        document.getElementById('hwCompletedCount').innerText = `✅ المنجزة: ${hwStats.done}`;
+        document.getElementById('hwPendingCount').innerText = `⏳ قيد الانتظار: ${hwStats.pending + hwStats.not_done}`;
+        document.getElementById('hwTotalCount').innerText = `📚 الإجمالي: ${hwStats.total}`;
+    }
+
+    function showDetails(type) {
+        let content = "";
+        allEvals.forEach(ev => {
+            let match = false;
+            if(type === 'exc' && ev.level === 'exc') match = true;
+            if(type === 'cre' && (ev.level === 'cre' || ev.level === 'creative')) match = true;
+            if(type === 'vg' && ev.level === 'vg') match = true;
+            if(type === 'fa' && ev.level === 'fa') match = true;
+            if(type === 'we' && (ev.level === 'we' || ev.level === 'weak')) match = true;
+            if(type === ev.award) match = true;
+            if(type === 'warning' && ev.warning) match = true;
+
+            if(match) {
+                content += `<div style="padding:10px; border-bottom:1px solid #eee">
+                    <strong>${ev.subject}</strong> <small>(${ev.date})</small>
+                    <div style="font-size:11px; color:var(--text-muted)">${ev.message || ''}</div>
+                </div>`;
+            }
+        });
+
+        document.getElementById('popupTitle').innerText = "تفاصيل السجل";
+        document.getElementById('popupContent').innerHTML = content || "لا توجد سجلات";
+        document.getElementById('popup').style.display = 'flex';
+    }
+
+    function closePopup() { document.getElementById('popup').style.display = 'none'; }
+</script>
 </body>
 </html>
